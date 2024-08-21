@@ -26,3 +26,5 @@ large
 6
 black
 5
+other
+8

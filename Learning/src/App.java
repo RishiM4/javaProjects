@@ -1,121 +1,37 @@
-import java.util.HashMap;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
 
 public class App {
-
-	static String answer = "lleso";
-    static String input =  "llell";
-    private static int getChars(Character character, String input){
-        int count = 0;
-        for(int k = 0; k < input.length(); k++){
-            if (input.charAt(k) == character) {
-                count++;
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("KeyListener Example");
+        JTextField textField = new JTextField();
+        textField.setText(null);
+        KeyListener listener = new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println("Key Pressed: " + e.getKeyCode()
+                
+                );
+                
             }
-        }
-        return count;
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                System.out.println("Key Released: " + e.getKeyChar());
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                System.out.println("Key Typed: " + e.getKeyChar());
+            }
+        };
+
+        frame.addKeyListener(listener);
+        //frame.add(textField);
+        frame.setSize(300, 200);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-    private static String removeChars(int count,String newCompiledAnswer,String compiledAnswer) {
-        //2
-        //##GYY
-        //GGGYY
-        
-        HashMap<Integer, Boolean> index = new HashMap<Integer, Boolean>();
-        StringBuffer output = new StringBuffer(compiledAnswer);
-        for(int k = 0; k <5; k++) {
-            index.put(k, false);
-            if (newCompiledAnswer.charAt(k) != '#') {
-                index.replace(k, true);
-                
-                
-            }
-        }
-        System.out.println(index);
-
-        for(int k = 4; k >=0&&count!=0; k--) {
-            if (compiledAnswer.charAt(k) == 'Y' && index.get(k)) {
-                output.setCharAt(k, 'X');
-                count--;
-
-            }
-        }
-        System.out.println(output);
-        return output.toString();
-    }
-	private static String checkForDupe(String input, String answer, int index, String compiledAnswer){
-        char character = answer.charAt(index-1);
-        int numberOfChars = getChars(character, input);
-        StringBuffer newCompiledAnswer = new StringBuffer(compiledAnswer);
-
-        if (numberOfChars > 1) {
-            //Chacacter = dupe character
-            int k = -1;
-            StringBuffer tempInput = new StringBuffer(input);
-            
-            while (!tempInput.toString().matches("["+character+"#]+")) {
-                k++;
-                
-                if (input.charAt(k)!=character) {
-                    tempInput.setCharAt(k, '#');
-                    newCompiledAnswer.setCharAt(k, '#');
-                    
-                }
-                
-                
-            }
-            
-            System.out.println(tempInput);
-            
-            System.out.println(newCompiledAnswer);
-            return removeChars(numberOfChars-getChars(character, answer), newCompiledAnswer.toString(), compiledAnswer);
-
-        }
-        
-
-        System.out.println(numberOfChars-getChars(character, answer));
-        return compiledAnswer;
-    }
-    private static Boolean checkForGreen(String input, int index) {
-        Boolean output = false;
-        if (input.charAt(index) == answer.charAt(index)) {
-            output = true;
-        }
-        return output;
-    }
-    private static Boolean checkForYellow(String input,  int index) {
-        String temp = "" + input.charAt(index);
-        
-        for (int k = 0; k<5; k++) {
-            if (temp.equals("" + answer.charAt(k)) ) {
-                return true;
-                
-            }
-        }
-        return false;
-    }
-    private static String compile(String input) {
-        StringBuffer output = new StringBuffer("XXXXX");
-        for(int p = 0; p < 5; p++) {
-            if(checkForYellow(input, p)) {
-                output.setCharAt(p, 'Y');
-            }
-        }
-        for(int p = 0; p <5; p++) {
-            if(checkForGreen(input, p)) {
-                output.setCharAt(p, 'G');
-                
-            }
-        }
-        System.out.println(output.toString());
-        return output.toString();
-    }
-	public static void main(String[] args){	
-        String output=compile(input);
-       for (int k = 1; k<=5; k++){
-            output = checkForDupe(input, answer,k,output);
-       }
-       
-        
-
-        
-        System.out.println("HI "+output);
-	}
 }

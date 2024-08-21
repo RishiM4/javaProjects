@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
@@ -11,10 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 public class WordleFiveLetter {
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_GRAY = "\u001B[90m";
+    
+    static final String ANSI_RESET = "\u001B[0m";
+    static final String ANSI_YELLOW = "\u001B[33m";
+    static final String ANSI_GREEN = "\u001B[32m";
+    static final String ANSI_GRAY = "\u001B[90m";
     static String[] storedGuesses = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",};
     static int guessNumber = 0;
     static int mode = 1;
@@ -48,15 +51,16 @@ public class WordleFiveLetter {
     static JLabel X= new JLabel("X");
     static JLabel Y= new JLabel("Y");
     static JLabel Z= new JLabel("Z");
-    static JPanel panel = new JPanel();
-    static Font customFont = new Font("Arial",Font.BOLD, 30);
     static JFrame frame = new JFrame("Keyboard Display");
-    static HashMap<Character, Integer> characterIndex1 = new HashMap<Character, Integer>();
+    static JPanel panel = new JPanel();
+    static HashMap<Character, Integer> letterIndex = new HashMap<Character, Integer>();
     static String current  ="";
     static String currentGuess = "";  
-    public static String answer;
-    
+    static String answer;
+    static int numOfGuesses = numberOfGuesses();
+    static int j;
     private static void setFont() {
+        Font customFont = new Font("Arial",Font.BOLD, 30);
         A.setFont(customFont);
         B.setFont(customFont);
         C.setFont(customFont);
@@ -102,32 +106,32 @@ public class WordleFiveLetter {
         
     }
     private static void setColor() {
-        A = changeColor(characterIndex1, A, 'A');
-        B = changeColor(characterIndex1, B, 'B');
-        C = changeColor(characterIndex1, C, 'C');
-        D = changeColor(characterIndex1, D, 'D');
-        E = changeColor(characterIndex1, E, 'E');
-        F = changeColor(characterIndex1, F, 'F');
-        G = changeColor(characterIndex1, G, 'G');
-        H = changeColor(characterIndex1, H, 'H');
-        I = changeColor(characterIndex1, I, 'I');
-        J = changeColor(characterIndex1, J, 'J');
-        K = changeColor(characterIndex1, K, 'K');
-        L = changeColor(characterIndex1, L, 'L');
-        M = changeColor(characterIndex1, M, 'M');
-        N = changeColor(characterIndex1, N, 'N');
-        O = changeColor(characterIndex1, O, 'O');
-        P = changeColor(characterIndex1, P, 'P');
-        Q = changeColor(characterIndex1, Q, 'Q');
-        R = changeColor(characterIndex1, R, 'R');
-        S = changeColor(characterIndex1, S, 'S');
-        T = changeColor(characterIndex1, T, 'T');
-        U = changeColor(characterIndex1, U, 'U');
-        V = changeColor(characterIndex1, V, 'V');
-        W = changeColor(characterIndex1, W, 'W');
-        X = changeColor(characterIndex1, X, 'X');
-        Y = changeColor(characterIndex1, Y, 'Y');
-        Z = changeColor(characterIndex1, Z, 'Z');
+        A = changeColor(letterIndex, A, 'A');
+        B = changeColor(letterIndex, B, 'B');
+        C = changeColor(letterIndex, C, 'C');
+        D = changeColor(letterIndex, D, 'D');
+        E = changeColor(letterIndex, E, 'E');
+        F = changeColor(letterIndex, F, 'F');
+        G = changeColor(letterIndex, G, 'G');
+        H = changeColor(letterIndex, H, 'H');
+        I = changeColor(letterIndex, I, 'I');
+        J = changeColor(letterIndex, J, 'J');
+        K = changeColor(letterIndex, K, 'K');
+        L = changeColor(letterIndex, L, 'L');
+        M = changeColor(letterIndex, M, 'M');
+        N = changeColor(letterIndex, N, 'N');
+        O = changeColor(letterIndex, O, 'O');
+        P = changeColor(letterIndex, P, 'P');
+        Q = changeColor(letterIndex, Q, 'Q');
+        R = changeColor(letterIndex, R, 'R');
+        S = changeColor(letterIndex, S, 'S');
+        T = changeColor(letterIndex, T, 'T');
+        U = changeColor(letterIndex, U, 'U');
+        V = changeColor(letterIndex, V, 'V');
+        W = changeColor(letterIndex, W, 'W');
+        X = changeColor(letterIndex, X, 'X');
+        Y = changeColor(letterIndex, Y, 'Y');
+        Z = changeColor(letterIndex, Z, 'Z');
 
 
     }
@@ -165,8 +169,10 @@ public class WordleFiveLetter {
         
     }
     private static void add() {
+        
         panel.setVisible(false);
         panel.setVisible(true);
+
         frame.add(A);
         frame.add(B);
         frame.add(C);
@@ -202,49 +208,79 @@ public class WordleFiveLetter {
         for (int k = 0; k < 5; k++) {
             String guessAccuracy = "" + current.charAt(k);
             if (guessAccuracy.equals("X")) {
-                if (1 >= characterIndex1.get(guess.charAt(k))) {
-                    characterIndex1.replace(guess.charAt(k), 1);
+                if (1 >= letterIndex.get(guess.charAt(k))) {
+                    letterIndex.replace(guess.charAt(k), 1);
                 }
                 
             }
             if (guessAccuracy.equals("Y")) {
-                if (2 >= characterIndex1.get(guess.charAt(k))) {
-                    characterIndex1.replace(guess.charAt(k), 2);
+                if (2 >= letterIndex.get(guess.charAt(k))) {
+                    letterIndex.replace(guess.charAt(k), 2);
                 }
             }
             if (guessAccuracy.equals("G")) {
-                if (3 >= characterIndex1.get(guess.charAt(k))) {
-                    characterIndex1.replace(guess.charAt(k), 3);
+                if (3 >= letterIndex.get(guess.charAt(k))) {
+                    letterIndex.replace(guess.charAt(k), 3);
                 }
             }
             
         }
         for (int k = 0; k < 26; k++) {
-            if (characterIndex1.get(alphabet.charAt(k)).equals(0)) {
+            if (letterIndex.get(alphabet.charAt(k)).equals(0)) {
                 results.put(alphabet.charAt(k), "" + alphabet.charAt(k));
             }
-            if (characterIndex1.get(alphabet.charAt(k)).equals(1)) {
+            if (letterIndex.get(alphabet.charAt(k)).equals(1)) {
                 results.put(alphabet.charAt(k), ANSI_GRAY + alphabet.charAt(k)+ ANSI_RESET);
             }
-            if (characterIndex1.get(alphabet.charAt(k)).equals(2)) {
+            if (letterIndex.get(alphabet.charAt(k)).equals(2)) {
                 results.put(alphabet.charAt(k), ANSI_YELLOW + alphabet.charAt(k)+ ANSI_RESET);
             }
-            if (characterIndex1.get(alphabet.charAt(k)).equals(3)) {
+            if (letterIndex.get(alphabet.charAt(k)).equals(3)) {
                 results.put(alphabet.charAt(k), ANSI_GREEN + alphabet.charAt(k)+ ANSI_RESET);
             }
         }
     }
     private static void alphabet() {
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        characterIndex1.put('#', 0);
+        letterIndex.put('#', 0);
         for (int k = 0; k < 26; k++) {
-            characterIndex1.put(alphabet.charAt(k), 0);
+            letterIndex.put(alphabet.charAt(k), 0);
         }
+        return;
     }
     private static void updateWindow() {
         panel.setBackground(Color.DARK_GRAY);
         panel.setSize(280,200);
-        
+        KeyListener listener = new KeyListener() {
+            String keyboardInput = "";
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() != 10) {
+                    keyboardInput = keyboardInput+e.getKeyChar();
+                    printGuesses(keyboardInput, false);
+                }
+                else {
+                    
+                    j++;
+                    
+                    compileResults(keyboardInput, j);
+                    keyboardInput = "";
+                    return;
+                    //return guess, reduce guesses by one and call method.
+                }
+                
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+        };
+        frame.addKeyListener(listener);
         frame.add(panel);
         frame.setSize(280, 135);
         frame.setLayout(null);
@@ -257,7 +293,7 @@ public class WordleFiveLetter {
                 
         }
     });
-    }
+    }   
     private static void updateKeyboard() {
         if (temp != 0) {
             
@@ -380,7 +416,8 @@ public class WordleFiveLetter {
         return false;
     }
     private static void chooseWord() {
-        
+        System.out.println("Would you like to choose your word, or have a random word generated?");
+        System.out.println("Please type 'Random' for a random word and 'Custom' for a custom word!");
         boolean generateAnswer = wordType();
         if (generateAnswer) {
             Random random = new Random();
@@ -417,21 +454,27 @@ public class WordleFiveLetter {
 
     }
     private static Boolean checkForGreen(String input, int index) {
-        Boolean output = false;
-        if (input.charAt(index) == answer.charAt(index)) {
-            output = true;
+        try {
+            if (input.charAt(index) == answer.charAt(index)) {
+                return true;
+            }
+        } catch (Exception e) {
         }
-        return output;
+        return false;
     }
     private static Boolean checkForYellow(String input,  int index) {
-        String temp = "" + input.charAt(index);
         
-        for (int k = 0; k<5; k++) {
-            if (temp.equals("" + answer.charAt(k)) ) {
-                return true;
-                
+        try {
+            String temp = "" + input.charAt(index);
+            for (int k = 0; k<5; k++) {
+                if (temp.equals("" + answer.charAt(k)) ) {
+                    return true;
+                    
+                }
             }
+        } catch (Exception e) {
         }
+        
         return false;
     }
     private static String convertToWord (String result, String input) {
@@ -449,34 +492,130 @@ public class WordleFiveLetter {
         }
         return output;
     }
-    private static void printGuesses(String guess) {
-        storedGuesses[guessNumber] = guess;
-        guessNumber++;
-        for(int k = 0; k < 31; k++){
-            System.err.println("");
+    private static void printGuesses(String guess, Boolean updateGuesses) {
+        if (updateGuesses) {
+            storedGuesses[guessNumber] = guess;
+            guessNumber++;
+        
+            for(int k = 0; k < 31; k++){
+                System.err.println("");
+            }
+            for(int k = 1; k < guessNumber+1; k++) {
+                System.err.println(storedGuesses[k]);
+            }
         }
-        for(int k = 1; k < guessNumber+1; k++) {
-            System.err.println(storedGuesses[k]);
+        else{
+            for(int k = 0; k < 31; k++){
+                System.err.println("");
+            }
+            for(int k = 1; k < guessNumber+1; k++) {
+                System.err.println(storedGuesses[k]);
+            }
+            System.out.println(guess);
         }
+        
+        
     }
-    private static boolean compileResults(String input, int guesses) {
+    private static int getChars(Character character, String input){
+        int count = 0;
+        for(int k = 0; k < input.length(); k++){
+            if (input.charAt(k) == character) {
+                count++;
+            }
+        }
+        return count;
+    }
+    private static String removeChars(int count,String newCompiledAnswer,String compiledAnswer) {
+        //2
+        //##GYY
+        //GGGYY
+        
+        HashMap<Integer, Boolean> index = new HashMap<Integer, Boolean>();
+        StringBuffer output = new StringBuffer(compiledAnswer);
+        for(int k = 0; k <5; k++) {
+            index.put(k, false);
+            if (newCompiledAnswer.charAt(k) != '#') {
+                index.replace(k, true);
+                
+                
+            }
+        }
+        //System.out.println(index);
+
+        for(int k = 4; k >=0&&count!=0; k--) {
+            if (compiledAnswer.charAt(k) == 'Y' && index.get(k)) {
+                output.setCharAt(k, 'X');
+                count--;
+
+            }
+        }
+        //System.out.println(output);
+        return output.toString();
+    }
+	private static String checkForDupe(String input, String answer, int index, String compiledAnswer){
+        char character = answer.charAt(index-1);
+        int numberOfChars = getChars(character, input);
+        StringBuffer newCompiledAnswer = new StringBuffer(compiledAnswer);
+
+        if (numberOfChars > 1) {
+            //Chacacter = dupe character
+            int k = -1;
+            StringBuffer tempInput = new StringBuffer(input);
+            
+            while (!tempInput.toString().matches("["+character+"#]+")) {
+                k++;
+                
+                if (input.charAt(k)!=character) {
+                    tempInput.setCharAt(k, '#');
+                    newCompiledAnswer.setCharAt(k, '#');
+                    
+                }
+                
+                
+            }
+            
+            //System.out.println(tempInput);
+            
+            //System.out.println(newCompiledAnswer);
+            return removeChars(numberOfChars-getChars(character, answer), newCompiledAnswer.toString(), compiledAnswer);
+
+        }
+        
+
+        return compiledAnswer;
+    }
+    private static String compile(String input) {
         StringBuffer output = new StringBuffer("XXXXX");
-        String currentGuess = input;
-        currentGuess = prepareWord(currentGuess, true);
         for(int p = 0; p < 5; p++) {
-            if(checkForYellow(currentGuess, p)) {
+            if(checkForYellow(input, p)) {
                 output.setCharAt(p, 'Y');
             }
         }
         for(int p = 0; p <5; p++) {
-            if(checkForGreen(currentGuess, p)) {
+            if(checkForGreen(input, p)) {
                 output.setCharAt(p, 'G');
                 
             }
         }
+        return output.toString();
+    }
+    private static String initDupes(String input) {
+        String output=compile(input);
+        for (int k = 1; k<=5; k++){
+            output = checkForDupe(input, answer,k,output);
+        }
+        return output;
+    }
+    private static boolean compileResults(String input, int guesses) {
+        
+        String currentGuess = input;
+        currentGuess = prepareWord(currentGuess, true);
+        StringBuffer output = new StringBuffer(initDupes(input));
         current = output.toString();
+        
         System.out.println();
-        printGuesses(convertToWord(output.toString(), currentGuess));
+        printGuesses(convertToWord(output.toString(), currentGuess), true);
+        updateKeyboard();
         if(output.toString().equals("GGGGG")) {
             System.err.println("");
             updateHighscore(guesses);
@@ -486,17 +625,17 @@ public class WordleFiveLetter {
             System.err.println("");
             System.exit(0);
             return true;
-         }
+        }
         return false;
     }
-
     public static void main(String[] args) throws Exception {
+        System.out.println("Would you like to choose your word, or have a random word generated?");
+        System.out.println("Please type 'Random' for a random word and 'Custom' for a custom word!");
+        scanner.nextLine();
         alphabet();
-        for(int k = 0; k < 32; k++){
-            System.err.println("");
-        }
-        printer.print("Would you like to choose your word, or have a random word generated?");
-        printer.print("Please type 'Random' for a random word and 'Custom' for a custom word!");
+        
+        
+        
         chooseWord();
         if (quickFix) {
             printSpaces();
@@ -506,7 +645,8 @@ public class WordleFiveLetter {
         }
         printSpaces();
         printer.print("Please Input How Many Guesses You Would Like!");
-        int numOfGuesses = numberOfGuesses();
+        
+        
         if (quickFix) {
             printSpaces();
             printer.print("Please Provide A Proper Value");
@@ -514,16 +654,16 @@ public class WordleFiveLetter {
             return;
         }
         else{
-            for(int k = 0; k <= numOfGuesses; k++) {
+            for(j = 0; j <= numOfGuesses; j++) {
                 currentGuess = scanner.nextLine();
 
                 printer.print(currentGuess);
                 
-                if (compileResults(currentGuess, k)) {
+                if (compileResults(currentGuess, j)) {
                     scanner.close();
                     return;
                 }
-                updateKeyboard();
+                
             }
         }
         
