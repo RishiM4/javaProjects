@@ -28,3 +28,13 @@ black
 5
 other
 8
+hotel
+5
+movie
+5
+games
+9
+about
+4
+value
+7

@@ -1,9 +1,0 @@
-private static final String 
-
-palindrome detector 
-bubble sort
-selection sort
-
-
-CraneOperator
-Crane

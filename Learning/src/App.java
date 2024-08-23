@@ -1,37 +1,66 @@
 import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
 
 public class App {
     public static void main(String[] args) {
-        JFrame frame = new JFrame("KeyListener Example");
-        JTextField textField = new JTextField();
-        textField.setText(null);
-        KeyListener listener = new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println("Key Pressed: " + e.getKeyCode()
+        Path filePath1 = Paths.get("wordleInputData.txt");
+        String output = "";
+        try {
+            List<String> lines = Files.readAllLines(filePath1);
+            
+            try {
+                for(int k = 0; k <10000; k++) {
+                    output = output+lines.get(k)+" ";
+                }
+            } catch (Exception e) {
+                //System.out.println(output);
+            }
+            StringBuffer temp = new StringBuffer(output);
+            //System.out.println(temp);
+             
+            String tem="";
+            try {
+                while(temp.toString().contains(" ")) {
+                    //System.out.println("HI");
+                    tem = tem+temp.charAt(0)+temp.charAt(1)+temp.charAt(2)+temp.charAt(3)+temp.charAt(4)+"\n";
+                    temp.deleteCharAt(0);
+                    temp.deleteCharAt(0);
+                    temp.deleteCharAt(0);
+                    temp.deleteCharAt(0);
+                    temp.deleteCharAt(0);
+                    temp.deleteCharAt(0);
+    
+                }
+            } catch (Exception e) {
                 
-                );
                 
             }
+            //tem = tem+temp.charAt(0)+temp.charAt(1)+temp.charAt(2)+temp.charAt(3)+temp.charAt(4)+"\n";
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                System.out.println("Key Released: " + e.getKeyChar());
-            }
+            System.out.println(tem);
+            
+            
+            
+        } catch (IOException e) {
+        }
+        
+        try {
+           
+            
+           
+            
+           
 
-            @Override
-            public void keyTyped(KeyEvent e) {
-                System.out.println("Key Typed: " + e.getKeyChar());
-            }
-        };
+        } catch (Exception e) {
 
-        frame.addKeyListener(listener);
-        //frame.add(textField);
-        frame.setSize(300, 200);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
+        
     }
 }

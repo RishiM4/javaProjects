@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 public class WordleFiveLetter {
-    
+    static boolean usingKeyboard = false;
     static final String ANSI_RESET = "\u001B[0m";
     static final String ANSI_YELLOW = "\u001B[33m";
     static final String ANSI_GREEN = "\u001B[32m";
@@ -23,7 +23,8 @@ public class WordleFiveLetter {
     static int mode = 1;
     static boolean quickFix  = false;
     static Printer printer = new Printer();
-    static Scanner scanner = new Scanner(System.in);
+    static boolean keyboardPrinted = true;
+    //static Scanner scanner = new Scanner(System.in);
     static int temp = 0;
     static JLabel A= new JLabel("A");
     static JLabel B= new JLabel("B");
@@ -57,7 +58,7 @@ public class WordleFiveLetter {
     static String current  ="";
     static String currentGuess = "";  
     static String answer;
-    static int numOfGuesses = numberOfGuesses();
+    
     static int j;
     private static void setFont() {
         Font customFont = new Font("Arial",Font.BOLD, 30);
@@ -204,6 +205,7 @@ public class WordleFiveLetter {
         HashMap<Character, String> results = new HashMap<Character, String>();
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String guess = prepareWord(currentGuess, true);
+        
         guess = guess.toUpperCase();
         for (int k = 0; k < 5; k++) {
             String guessAccuracy = "" + current.charAt(k);
@@ -225,6 +227,7 @@ public class WordleFiveLetter {
             }
             
         }
+        
         for (int k = 0; k < 26; k++) {
             if (letterIndex.get(alphabet.charAt(k)).equals(0)) {
                 results.put(alphabet.charAt(k), "" + alphabet.charAt(k));
@@ -238,7 +241,9 @@ public class WordleFiveLetter {
             if (letterIndex.get(alphabet.charAt(k)).equals(3)) {
                 results.put(alphabet.charAt(k), ANSI_GREEN + alphabet.charAt(k)+ ANSI_RESET);
             }
+        
         }
+        
     }
     private static void alphabet() {
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -254,18 +259,39 @@ public class WordleFiveLetter {
         KeyListener listener = new KeyListener() {
             String keyboardInput = "";
             @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() != 10) {
-                    keyboardInput = keyboardInput+e.getKeyChar();
+            public void keyPressed(KeyEvent f) {
+                
+                if (f.getKeyCode() == 10) {
+                    if (keyboardPrinted) {
+                        j++;
+                        usingKeyboard = true;
+                        Scanner scanner = new Scanner(System.in);
+                        currentGuess = keyboardInput;
+                        compileResults(keyboardInput, j, scanner);
+                        updateKeyboard();
+                        scanner.close();
+                        keyboardInput = "";
+                    }
+                    
+                    
+                    
+                    return;
+                    
+                }
+                else if(f.getKeyCode()==8){
+                    keyboardPrinted=true;
+                    StringBuffer temp = new StringBuffer(keyboardInput);
+                    try {
+                        temp.deleteCharAt(temp.length()-1);
+                    } catch (Exception e) {
+                    }
+                    keyboardInput = temp.toString();
                     printGuesses(keyboardInput, false);
                 }
                 else {
-                    
-                    j++;
-                    
-                    compileResults(keyboardInput, j);
-                    keyboardInput = "";
-                    return;
+                    keyboardPrinted = true;
+                    keyboardInput = keyboardInput+f.getKeyChar();
+                    printGuesses(keyboardInput, false);
                     //return guess, reduce guesses by one and call method.
                 }
                 
@@ -311,14 +337,14 @@ public class WordleFiveLetter {
     }
     private static void printSpaces() {
         for(int k = 0; k < 32; k++){
-            System.err.println("");
+            System.err.println();
         }
     }
-    private static void updateHighscore(int guesses) {
-        if (mode == 1) {
+    private static void updateHighscore(int guesses, boolean win) {
+        if (mode == 1&&win) {
             try {
             
-                Path filePath = Paths.get("wordleFiveLetterHighscores.txt");
+                Path filePath = Paths.get("wordleHighScoreData.txt");
                 List<String> lines = Files.readAllLines(filePath);
                 int highScore = 0;
                 if (-1 != lines.indexOf(answer)) {
@@ -350,12 +376,20 @@ public class WordleFiveLetter {
                 e.printStackTrace();
             }
         }
-        else {
+        else if(!win){
+            try {
+                Path filePath = Paths.get("wordleFiveLetterHighscores.txt");
+                List<String> lines = Files.readAllLines(filePath);
+                int highScore = Integer.parseInt(lines.get(lines.indexOf(answer)+1));
+                System.out.println("Good Try! The highscore was " + highScore + "guesses.");
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
             return;
         }
         
     }
-    private static int numberOfGuesses() {
+    private static int numberOfGuesses(Scanner scanner) {
         int guesses = -1;
         
         while (guesses < 0) {
@@ -377,7 +411,7 @@ public class WordleFiveLetter {
         return guesses;
             
     }   
-    private static Boolean wordType() {
+    private static Boolean wordType(Scanner scanner) {
         
         String input = scanner.nextLine();
         input = prepareWord(input, false);
@@ -415,14 +449,21 @@ public class WordleFiveLetter {
         }
         return false;
     }
-    private static void chooseWord() {
+    private static void chooseWord(Scanner scanner) {
         System.out.println("Would you like to choose your word, or have a random word generated?");
         System.out.println("Please type 'Random' for a random word and 'Custom' for a custom word!");
-        boolean generateAnswer = wordType();
+        boolean generateAnswer = wordType(scanner);
         if (generateAnswer) {
             Random random = new Random();
-            String[] words = new String[] {"about","other","which","their","there","first","would","these","click","price","state","email","world","music","after","where","books","links","years","order","items","group","under","games","could","great","hotel","store","terms","right","local","those","using","phone","forum","based","black","check","index","being","women","today","south","pages","found","house","photo","power","while","three","total","place","think","north","posts","media","since","guide","board","white","small","times","sites","level","hours","image","title","shall","class","still","money","every","visit","tools","reply","value","press","learn","print","stock","point","sales","large","table","start","model","human","movie","march","yahoo","going","study","staff","again","april","never","users","topic","below",};
-            answer = words[random.nextInt(99)];
+            Path filePath = Paths.get("wordleAnswerData.txt");
+            try {
+                List<String> lines = Files.readAllLines(filePath);
+                answer = lines.get(random.nextInt(2296));
+            } catch (IOException e) {
+                e.printStackTrace();
+                answer = "words";
+            }
+            
             if (mode == 2) {
                 System.out.println(answer);
             }
@@ -493,26 +534,42 @@ public class WordleFiveLetter {
         return output;
     }
     private static void printGuesses(String guess, Boolean updateGuesses) {
-        if (updateGuesses) {
-            storedGuesses[guessNumber] = guess;
-            guessNumber++;
+        //print guesses method is being called multiple times.
         
-            for(int k = 0; k < 31; k++){
-                System.err.println("");
-            }
+        
+        if (updateGuesses) {
+            
+            storedGuesses[guessNumber] = guess;
+            guessNumber=guessNumber+1;
+            keyboardPrinted = false;
+            printSpaces();
             for(int k = 1; k < guessNumber+1; k++) {
-                System.err.println(storedGuesses[k]);
+                if (!storedGuesses[k].equals("")) {
+                    System.err.println(storedGuesses[k]);
+                }
+                
             }
+            
         }
         else{
-            for(int k = 0; k < 31; k++){
-                System.err.println("");
-            }
+            printSpaces();
             for(int k = 1; k < guessNumber+1; k++) {
-                System.err.println(storedGuesses[k]);
+                //error with index is out of bounds.
+                try {
+                    if (!storedGuesses[k].equals("")) {
+                        System.err.println(storedGuesses[k]);
+                    }
+                   
+
+                } catch (Exception e) {
+                }
             }
             System.out.println(guess);
+            keyboardPrinted = true;
         }
+        
+       
+        
         
         
     }
@@ -566,17 +623,20 @@ public class WordleFiveLetter {
                 k++;
                 
                 if (input.charAt(k)!=character) {
-                    tempInput.setCharAt(k, '#');
-                    newCompiledAnswer.setCharAt(k, '#');
+                    try {
+                        tempInput.setCharAt(k, '#');
+                        newCompiledAnswer.setCharAt(k, '#');
+                        
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
                     
                 }
                 
                 
             }
             
-            //System.out.println(tempInput);
             
-            //System.out.println(newCompiledAnswer);
             return removeChars(numberOfChars-getChars(character, answer), newCompiledAnswer.toString(), compiledAnswer);
 
         }
@@ -606,72 +666,118 @@ public class WordleFiveLetter {
         }
         return output;
     }
-    private static boolean compileResults(String input, int guesses) {
+    private static boolean checkIfRealWord(String input){
+        Path filePath = Paths.get("wordleInputData.txt");
+        
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            if (lines.contains(input)) {
+                return true;
+            }
+            else{
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    
+    private static void compileResults(String input, int guesses, Scanner scanner) {
         
         String currentGuess = input;
         currentGuess = prepareWord(currentGuess, true);
         StringBuffer output = new StringBuffer(initDupes(input));
         current = output.toString();
         
-        System.out.println();
+        
+        if (!checkIfRealWord(input)) {
+            j++;
+            System.out.println("Please Enter A Valid Word.");
+            return;
+        }
         printGuesses(convertToWord(output.toString(), currentGuess), true);
         updateKeyboard();
         if(output.toString().equals("GGGGG")) {
             System.err.println("");
-            updateHighscore(guesses);
-            System.err.println("Congratulations!");
-            System.err.println("You have won!");
-            System.err.println("Thanks for playing!");
-            System.err.println("");
-            System.exit(0);
-            return true;
+            updateHighscore(j, true);
+            endProgram(scanner);
+                    
+                    
+            return;
         }
-        return false;
+        return;
+    }
+    private static void endProgram(Scanner scanner) {
+        System.err.println("Congratulations!");
+        System.err.println("You have won!");
+        System.err.println("Thanks for playing!");
+        System.err.println("");
+        scanner.close();
+        System.exit(0);
+        
     }
     public static void main(String[] args) throws Exception {
-        System.out.println("Would you like to choose your word, or have a random word generated?");
-        System.out.println("Please type 'Random' for a random word and 'Custom' for a custom word!");
-        scanner.nextLine();
+        
         alphabet();
         
+        Scanner scanner = new Scanner(System.in);
         
+        chooseWord(scanner);
+
+
         
-        chooseWord();
         if (quickFix) {
             printSpaces();
             printer.print("Please Provide A Proper Value");
             printer.print("Program Terminating...");
             return;
         }
+        
         printSpaces();
         printer.print("Please Input How Many Guesses You Would Like!");
-        
-        
-        if (quickFix) {
-            printSpaces();
-            printer.print("Please Provide A Proper Value");
-            printer.print("Program Terminating...");
-            return;
-        }
-        else{
-            for(j = 0; j <= numOfGuesses; j++) {
-                currentGuess = scanner.nextLine();
-
-                printer.print(currentGuess);
+        int numOfGuesses = numberOfGuesses(scanner);
+        if (!usingKeyboard) {
+            if (quickFix) {
+                printSpaces();
+                printer.print("Please Provide A Proper Value");
+                printer.print("Program Terminating...");
+                return;
+            }
+            else{
+                updateKeyboard();
+                for(j = 0; j <= numOfGuesses; j++) {
+                    try {
+                        currentGuess = scanner.nextLine(); 
+                    } catch (Exception e) {
+                        usingKeyboard = true;
+                        printGuesses("", false);
+                        break;
                 
-                if (compileResults(currentGuess, j)) {
-                    scanner.close();
-                    return;
+                    }
+                    
+    
+    
+                    printer.print(currentGuess);
+                    keyboardPrinted = true;
+                    compileResults(currentGuess, j, scanner);
+                    
+                    
                 }
-                
             }
         }
+       
         
+        while(j!=numOfGuesses){
+            //updateKeyboard();
+            scanner.close();
+        }
         
         scanner.close();
         printer.print("");
         printer.print("Out of Guesses :(");
         printer.print("The word was " + answer + ".");
+        updateHighscore(99, false);
         printer.print("Try Again Next Time!");
         printer.print("");
         System.exit(0);
@@ -679,4 +785,3 @@ public class WordleFiveLetter {
     }
 }
 
-//add word library
