@@ -2,13 +2,18 @@ import java.util.Scanner;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -21,10 +26,10 @@ public class WordleFiveLetter {
     static String[] storedGuesses = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",};
     static int guessNumber = 0;
     static int mode = 1;
+    static boolean keepFirstGuess = true;
     static boolean quickFix  = false;
     static Printer printer = new Printer();
     static boolean keyboardPrinted = true;
-    //static Scanner scanner = new Scanner(System.in);
     static int temp = 0;
     static JLabel A= new JLabel("A");
     static JLabel B= new JLabel("B");
@@ -54,6 +59,8 @@ public class WordleFiveLetter {
     static JLabel Z= new JLabel("Z");
     static JFrame frame = new JFrame("Keyboard Display");
     static JPanel panel = new JPanel();
+    static JTextField textField = new JTextField(20); // 20 columns wide
+    static JButton button = new JButton("Hint");
     static HashMap<Character, Integer> letterIndex = new HashMap<Character, Integer>();
     static String current  ="";
     static String currentGuess = "";  
@@ -254,8 +261,32 @@ public class WordleFiveLetter {
         return;
     }
     private static void updateWindow() {
-        panel.setBackground(Color.DARK_GRAY);
-        panel.setSize(280,200);
+        textField.requestFocusInWindow();
+        
+        
+
+        textField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Update the label with the text from the JTextField
+                keyboardPrinted=true;
+                if (keyboardPrinted&&!textField.getText().equals("")) {
+                    j++;
+                    usingKeyboard = true;
+                    Scanner scanner = new Scanner(System.in);
+                    currentGuess = textField.getText();
+                    compileResults(textField.getText(), j, scanner);
+                   
+                    scanner.close();
+                    
+                }
+                
+                
+                textField.setText("");
+                return;
+            }
+        });
+
         KeyListener listener = new KeyListener() {
             String keyboardInput = "";
             @Override
@@ -268,7 +299,7 @@ public class WordleFiveLetter {
                         Scanner scanner = new Scanner(System.in);
                         currentGuess = keyboardInput;
                         compileResults(keyboardInput, j, scanner);
-                        updateKeyboard();
+                       
                         scanner.close();
                         keyboardInput = "";
                     }
@@ -306,22 +337,179 @@ public class WordleFiveLetter {
             }
 
         };
-        frame.addKeyListener(listener);
-        frame.add(panel);
-        frame.setSize(280, 135);
-        frame.setLayout(null);
-        frame.setVisible(true);
-        
-        frame.addWindowListener(new WindowAdapter() {
+        button.addActionListener(new ActionListener() {
             @Override
-            public void windowClosing(WindowEvent e){
-                System.exit(0);
+            public void actionPerformed(ActionEvent e) {
+                String conformation = "Are you sure you would like a hint?";
+                String panelName = "Hint Confirmation";
+                int output  = JOptionPane.showConfirmDialog(frame, conformation, panelName,0 );
+                if (output == 0) {
+                    panel.remove(button);
+                    frame.add(panel);
+                    frame.revalidate();
+                    frame.repaint();
+                    createHint(output);
                 
+                    
+                    frame.setSize(frame.getWidth()-1, frame.getHeight()-1);
+                    frame.setSize(frame.getWidth()+1, frame.getHeight()+1);
+                }
+                
+            }
         }
-    });
-    }   
+        );
+
+        Border border = BorderFactory.createLineBorder(Color.WHITE, 5);
+        textField.setBounds(100,100,100,50);
+        textField.setBackground(Color.GRAY);
+        textField.setFont(null);
+        textField.setBorder(border);
+        
+        button.setBackground(Color.GRAY);
+        button.setBorder(border);
+        button.setBounds(150, 25, 95, 30);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(false);
+        button.setForeground(Color.WHITE);
+
+        panel.setBackground(Color.DARK_GRAY);
+        panel.setBackground(Color.DARK_GRAY);
+        panel.add(textField);
+        panel.setSize(280,200);
+        panel.add(button);
+        panel.setLayout(null);
+
+        frame.add(panel);
+        frame.addKeyListener(listener);
+        frame.getContentPane().setBackground(Color.DARK_GRAY);
+        frame.setSize(300,200);
+        frame.setLayout(null);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    } 
+    
+    private static void createHint(int giveHint){
+        if (giveHint == 0) {
+            Random random = new Random();
+            int hintType = random.nextInt(4);
+            hintType = 1;
+            
+            if (hintType==0) {
+                getVowels();
+                return;
+            }
+            else if (hintType ==1) {
+                //find word with similiar chars.
+                similarWord();
+            }
+            else if(hintType ==2) {
+                
+            }
+            else{
+
+            }
+            //Number of vowels
+            //reveal random letter
+            //word that contains similiar chars
+            //guess a random word
+            
+            
+            return;
+        }
+        else{
+            
+            return;
+        }
+    }  
+    private static void getVowels() {
+        int numOfVowels = 0;
+        for (int k = 0;k<=4; k++) {
+            Character currentChar = answer.charAt(k);
+            if (currentChar.equals('a')) {
+                numOfVowels++;
+            }
+            else if (currentChar.equals('e')) {
+                numOfVowels++;
+            }
+            else if (currentChar.equals('i')) {
+                numOfVowels++;
+            }
+            else if (currentChar.equals('o')) {
+                numOfVowels++;
+            }
+            else if (currentChar.equals('u')) {
+                numOfVowels++;
+            }
+            
+        }
+        JPanel hintPanel = new JPanel();
+        JLabel label = new JLabel("The answer contains "+numOfVowels+" vowels");
+        
+        
+
+        
+        
+        label.setBounds(50, 50, 25, 25);
+        label.setForeground(Color.WHITE);
+        hintPanel.setBackground(Color.DARK_GRAY);
+        hintPanel.setBounds(0,100,250,250);
+        hintPanel.add(label);
+        System.out.println("The answer contians "+numOfVowels+" vowels!");
+        return;
+    }
+    
+    private static void similarWord(){
+        
+        StringBuffer tempAnswer = new StringBuffer(answer);
+        try {
+            Path filePath = Paths.get("wordleInputData.txt");
+            List<String> lines = Files.readAllLines(filePath);
+            ArrayList<String> output = new ArrayList<String>();
+            Random random = new Random();
+
+            Character rhymeChar1 = tempAnswer.charAt(random.nextInt(5));
+            tempAnswer.deleteCharAt(tempAnswer.indexOf(rhymeChar1+""));
+            Character rhymeChar2 = tempAnswer.charAt(random.nextInt(4));
+            tempAnswer.deleteCharAt(tempAnswer.indexOf(rhymeChar2+""));
+            Character rhymeChar3 = tempAnswer.charAt(random.nextInt(3));
+
+                
+           
+            
+            for(int k =0; k < lines.size(); k++){
+                String current = lines.get(k);
+                if (current.contains(rhymeChar1.toString())&&current.contains(rhymeChar2.toString())&&current.contains(rhymeChar3.toString())) {
+                    
+                    if (!current.equals(answer)) {
+                        int numberOfDupeLetters = 0;
+                        for(int j = 0; j < 5; j++) {
+                            if (current.contains(answer.charAt(j)+"")) {
+                                numberOfDupeLetters++;
+                            }
+                        }
+                        if (numberOfDupeLetters==3) {
+                            output.add(current);
+                        }
+                        
+                    }
+                }
+            }
+            if (output.size()==0) {
+                similarWord();
+            }
+            System.out.println("The word '"+output.get(random.nextInt(output.size()))+"' contains three letters in common with the answer.");
+            return;
+                
+        } catch (Exception e) {
+            
+        }
+        return;
+    }
     private static void updateKeyboard() {
-        if (temp != 0) {
+        if (temp == 0) {
             
             condenseResults();
             setColor();
@@ -668,7 +856,7 @@ public class WordleFiveLetter {
     }
     private static boolean checkIfRealWord(String input){
         Path filePath = Paths.get("wordleInputData.txt");
-        
+        input = prepareWord(input, true);
         try {
             List<String> lines = Files.readAllLines(filePath);
             if (lines.contains(input)) {
@@ -680,9 +868,7 @@ public class WordleFiveLetter {
         } catch (IOException e) {
             return false;
         }
-    }
-
-    
+    } 
     private static void compileResults(String input, int guesses, Scanner scanner) {
         
         String currentGuess = input;
@@ -692,12 +878,18 @@ public class WordleFiveLetter {
         
         
         if (!checkIfRealWord(input)) {
-            j++;
-            System.out.println("Please Enter A Valid Word.");
+            j--;
+            printGuesses("Please Enter A Valid Word", false);
             return;
         }
+
         printGuesses(convertToWord(output.toString(), currentGuess), true);
         updateKeyboard();
+        if (keepFirstGuess) {
+            printGuesses(convertToWord(output.toString(), currentGuess), true);
+            keepFirstGuess = false;
+        }
+        
         if(output.toString().equals("GGGGG")) {
             System.err.println("");
             updateHighscore(j, true);
@@ -706,6 +898,8 @@ public class WordleFiveLetter {
                     
             return;
         }
+        
+        
         return;
     }
     private static void endProgram(Scanner scanner) {
@@ -745,7 +939,7 @@ public class WordleFiveLetter {
                 return;
             }
             else{
-                updateKeyboard();
+                //updateKeyboard();
                 for(j = 0; j <= numOfGuesses; j++) {
                     try {
                         currentGuess = scanner.nextLine(); 
@@ -785,3 +979,5 @@ public class WordleFiveLetter {
     }
 }
 
+//jpopupmenu
+//restart,giveup,new hint
