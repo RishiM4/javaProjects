@@ -1,0 +1,6 @@
+&&username&&
+&&numberofplays&&
+&&averagesolve&&
+&&numberofsoleves&&
+&&lowestsolve&&
+&&highscoresbeaten&&

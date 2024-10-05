@@ -1,12 +1,17 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class printWriterTest {
     public static void main(String[] args) {
-        String text = "Hell world!"; // Your text data
-        try (PrintWriter out = new PrintWriter("date.txt")) {
-            out.println(text); // Write the text to the file
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        Path filePath = Paths.get("insert name here");
+        try {
+			List<String> lines = Files.readAllLines(filePath);
+            Files.write(filePath, lines);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }

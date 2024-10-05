@@ -20,12 +20,7 @@ public class HashMapTest {
                 characterIndex.put(currentChar, 1);
             }
         }
-        String text = "Hell world!"; // Your text data
-        try (PrintWriter out = new PrintWriter("test.txt")) {
-            out.println(text + characterIndex.toString() + characterIndex); // Write the text to the file
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        
         printer.print(characterIndex.toString());
         
     }

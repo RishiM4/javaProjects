@@ -1,22 +1,34 @@
 import java.util.Scanner;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import javax.swing.border.Border;
-
+import javax.swing.border.MatteBorder;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+
 public class WordleFiveLetter {
     static boolean usingKeyboard = false;
     static final String ANSI_RESET = "\u001B[0m";
@@ -26,6 +38,7 @@ public class WordleFiveLetter {
     static String[] storedGuesses = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",};
     static int guessNumber = 0;
     static int mode = 1;
+    static int numOfGuesses;
     static boolean keepFirstGuess = true;
     static boolean quickFix  = false;
     static Printer printer = new Printer();
@@ -57,18 +70,57 @@ public class WordleFiveLetter {
     static JLabel X= new JLabel("X");
     static JLabel Y= new JLabel("Y");
     static JLabel Z= new JLabel("Z");
+    static JLabel downArrow = new JLabel("↓");
+    static JLabel upArrow = new JLabel("↑");
+    static JLabel enter = new JLabel("Enter");
+    static ImageIcon originalBackspaceIcon = new ImageIcon("deleteIcon.png");
+    static Image imageBackspaceIcon = originalBackspaceIcon.getImage();
+    static ImageIcon backspaceIcon = new ImageIcon(imageBackspaceIcon.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
+    static JLabel backspace = new JLabel(backspaceIcon);
     static JFrame frame = new JFrame("Keyboard Display");
     static JPanel panel = new JPanel();
-    static JTextField textField = new JTextField(20); // 20 columns wide
+    static JTextField textField = new JTextField(20);
+    static JPopupMenu popupMenu = new JPopupMenu();
+    static JCheckBoxMenuItem menuItemHideKeyboard = new JCheckBoxMenuItem("Hide Keyboard");
+    static JMenuItem menuItemGiveUp = new JMenuItem("Give Up");
+    static JMenuItem menuItemRefresh = new JMenuItem("Refresh");
+    static JMenuItem menuItemClose = new JMenuItem("Close");
+    static JMenuItem menuItemHint = new JMenuItem("Hint");
+    static JMenuBar menuBar = new JMenuBar();
+    static JMenu accountMenu = new JMenu("Account");
+    static JMenu editMenu = new JMenu("Edit");
+    static JMenu wordHelper = new JMenu("Word Helper");
+    static JMenuItem wordUnscramble = new JMenuItem("Unscramble Word");
+    static JMenuItem cutItem = new JMenuItem("Cut");
+    static JMenuItem copyItem = new JMenuItem("Copy");
+    static JMenuItem pasteItem = new JMenuItem("Paste");
+    static JMenuItem loginItem = new JMenuItem("Login");
+    static JMenuItem createAccountItem = new JMenuItem("Create Account");
+    static JMenuItem averageGuessesItem = new JMenuItem("Average Guesses");
+    static JMenuItem logoutMenuItem = new JMenuItem("Logout");
+    static UndoManager undoManager = new UndoManager();
+    static Boolean keyboardDisplayed = false;
     static JButton button = new JButton("Hint");
     static HashMap<Character, Integer> letterIndex = new HashMap<Character, Integer>();
     static String current  ="";
     static String currentGuess = "";  
     static String answer;
-    
+    static boolean control = false;
+    static boolean accountLoggedIn = false;
+    static String currentUser = "";
+    static boolean highScoreBeaten = false;
     static int j;
+    static ArrayList<String> guessIndex = new ArrayList<String>();
+    static ArrayList<String> answerIndex = new ArrayList<String>();
+    static ArrayList<String> trueGuessIndex = new ArrayList<String>();
+    static ArrayList<String> trueAnswerIndex = new ArrayList<String>();
+    static int displayNumber = 1;
+    static HashMap<Integer, Rectangle> boxPositions = new HashMap<Integer, Rectangle>();
+    static JPanel displayPanel = new JPanel();
+
     private static void setFont() {
         Font customFont = new Font("Arial",Font.BOLD, 30);
+        enter.setFont(customFont);
         A.setFont(customFont);
         B.setFont(customFont);
         C.setFont(customFont);
@@ -95,6 +147,9 @@ public class WordleFiveLetter {
         X.setFont(customFont);
         Y.setFont(customFont);
         Z.setFont(customFont);
+        downArrow.setFont(customFont);
+        upArrow.setFont(customFont);
+        enter.setFont(new Font("Arial", Font.PLAIN, 15));
     }
     private static JLabel changeColor(HashMap<Character,Integer> colored, JLabel letter, Character character) {
         
@@ -114,6 +169,7 @@ public class WordleFiveLetter {
         
     }
     private static void setColor() {
+        enter.setForeground(Color.WHITE);
         A = changeColor(letterIndex, A, 'A');
         B = changeColor(letterIndex, B, 'B');
         C = changeColor(letterIndex, C, 'C');
@@ -144,43 +200,47 @@ public class WordleFiveLetter {
 
     }
     private static void setPosition() {
-        
-        Q.setBounds(5,0,40,40);
-        W.setBounds(34,0,40,40);
-        E.setBounds(68,0,40,40);
-        R.setBounds(94,0,40,40);
-        T.setBounds(120,0,40,40);
-        Y.setBounds(145,0,40,40);
-        U.setBounds(170,0,40,40);
-        I.setBounds(197,0,40,40);
-        O.setBounds(210,0,40,40);
-        P.setBounds(238,0,40,40);
+        int originX = 15;
+        int originY = 325;
+        Q.setBounds(5+originX,10+originY,25,25);
+        W.setBounds(34+originX,10+originY,29,25);
+        E.setBounds(68+originX,10+originY,20,25);
+        R.setBounds(94+originX,10+originY,25,25);
+        T.setBounds(120+originX,10+originY,20,25);
+        Y.setBounds(145+originX,10+originY,20,25);
+        U.setBounds(170+originX,10+originY,25,25);
+        I.setBounds(197+originX,10+originY,20,25);
+        O.setBounds(210+originX,10+originY,25,25);
+        P.setBounds(238+originX,10+originY,20,25);
 
-        A.setBounds(15,30,40,40);
-        S.setBounds(41,30,40,40);
-        D.setBounds(66,30,40,40);
-        F.setBounds(94,30,40,40);
-        G.setBounds(118,30,40,40);
-        H.setBounds(148,30,40,40);
-        J.setBounds(177,30,40,40);
-        K.setBounds(200,30,40,40);
-        L.setBounds(228,30,40,40);
+        A.setBounds(15+originX,40+originY,25,25);
+        S.setBounds(41+originX,40+originY,20,25);
+        D.setBounds(66+originX,40+originY,25,25);
+        F.setBounds(94+originX,40+originY,20,25);
+        G.setBounds(118+originX,40+originY,25,25);
+        H.setBounds(148+originX,40+originY,25,25);
+        J.setBounds(177+originX,40+originY,20,25);
+        K.setBounds(200+originX,40+originY,25,25);
+        L.setBounds(228+originX,40+originY,20,25);
 
-        Z.setBounds(25,60,40,40);
-        X.setBounds(53,60,40,40);
-        C.setBounds(79,60,40,40);
-        V.setBounds(109,60,40,40);
-        B.setBounds(136,60,40,40);
-        N.setBounds(165,60,40,40);
-        M.setBounds(195,60,40,40);
+        enter.setBounds(5+originX,71+originY,39,22);
+        Z.setBounds(48+originX,70+originY,20,25);
+        X.setBounds(76+originX,70+originY,20,25);
+        C.setBounds(102+originX,70+originY,25,25);
+        V.setBounds(132+originX,70+originY,20,25);
+        B.setBounds(159+originX,70+originY,25,25);
+        N.setBounds(188+originX,70+originY,25,25);
+        M.setBounds(218+originX,70+originY,25,25);
+        backspace.setBounds(245+originX,68+originY,30,30);
         
-        
+        downArrow.setBounds(300,200,40,40);
+        upArrow.setBounds(300, 150, 40, 40);
     }
     private static void add() {
         
         panel.setVisible(false);
         panel.setVisible(true);
-
+        frame.add(enter);
         frame.add(A);
         frame.add(B);
         frame.add(C);
@@ -207,6 +267,9 @@ public class WordleFiveLetter {
         frame.add(X);
         frame.add(Y);
         frame.add(Z);
+        frame.add(backspace);
+        frame.add(downArrow);
+        frame.add(upArrow);
     }
     private static void condenseResults(){
         HashMap<Character, String> results = new HashMap<Character, String>();
@@ -252,31 +315,296 @@ public class WordleFiveLetter {
         }
         
     }
-    private static void alphabet() {
+    private static void initLists() {
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         letterIndex.put('#', 0);
         for (int k = 0; k < 26; k++) {
             letterIndex.put(alphabet.charAt(k), 0);
         }
+        for(int k = 0; k < 99; k++){
+            boxPositions.put(k, null);
+
+        }
+        for(int k =0; k < 99; k++){
+            guessIndex.add("WWWWW");
+            answerIndex.add("");
+            trueGuessIndex.add("WWWWW");
+            trueAnswerIndex.add("");
+        }
         return;
     }
-    private static void updateWindow() {
-        textField.requestFocusInWindow();
+    private static void generateBoxPositions(int originX, int originY){
+        Path filePath = Paths.get("wordlePositionData.txt");
+        for(int k =0; k < 30; k++){
+            try {
+                List<String> lines = Files.readAllLines(filePath);
+                String originalPos = lines.get(k);
+                String[] splittedPos= originalPos.split(",");
+                int finalX = Integer.parseInt(splittedPos[0])+originX;
+                int finalY = Integer.parseInt(splittedPos[1])+originY;
+                Rectangle bounds = new Rectangle(finalX, finalY, 40, 40);
+                boxPositions.replace(k, bounds);
+            } catch (IOException e) {
+                System.out.println("HI");
+            }
+        }
+ 
+    }
+    private static JPanel setBoxColor(JPanel tempPanel, int panelNumber){
+        try {
+            int turnNumber = 0;
+            for(;panelNumber >= 5;){
+                panelNumber = panelNumber -5;
+                turnNumber++;
+            }
+            String current = guessIndex.get(turnNumber);
+            if (current.charAt(panelNumber) == 'X') {
+                tempPanel.setBackground(Color.LIGHT_GRAY);
+            }
+            if (current.charAt(panelNumber) == 'Y') {
+                tempPanel.setBackground(Color.YELLOW);
+            }
+            if (current.charAt(panelNumber) == 'G') {
+                tempPanel.setBackground(Color.GREEN);
+            }
+        } catch (Exception e) {
+        }
         
+        return tempPanel;
+    }
+    private static JLabel setBoxLetter(JLabel label, int panelNumber){
         
+        try {
+            int turnNumber = 0;
+            for(;panelNumber >= 5;){
+                panelNumber = panelNumber -5;
+                turnNumber++;
+            }
+            String currentAnswer = answerIndex.get(turnNumber);
+            currentAnswer = currentAnswer.toUpperCase();
+            label.setText(""+currentAnswer.charAt(panelNumber)); 
+        } catch (Exception e) {
+        }
+        
+        return label;
+    }
+    private static void updateAnswerDisplay(){
+        frame.remove(displayPanel);
+        displayPanel = new JPanel();
+        for(int k =0; k <30; k++){
+            
+            JPanel tempPanel = new JPanel();
+            JLabel tempLabel = new JLabel("");
+            frame.remove(tempLabel);
+            frame.remove(tempPanel);
+            tempLabel = setBoxLetter(tempLabel, k);
+            tempPanel = setBoxColor(tempPanel, k);
 
+            
+            Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
+
+            tempPanel.setBorder(border);
+            generateBoxPositions(10,10);
+            Rectangle bounds = boxPositions.get(k);
+            tempPanel.setBounds(bounds);
+            
+            tempLabel.setBounds(bounds);
+
+            Font customFont = new Font("Arial",Font.BOLD, 26);
+            tempLabel.setFont(customFont);
+            
+            
+            tempPanel.add(tempLabel);
+            displayPanel.add(tempPanel);
+
+
+        }
+        frame.add(displayPanel);
+        displayPanel.setBackground(Color.DARK_GRAY);
+        displayPanel.setLayout(null);
+        displayPanel.setBounds(15,10,260,310);
+        displayPanel.setVisible(true);
+    }
+    private static void updateWindow() {
+        if (!textField.hasFocus()) {
+               
+        }
+        textField.requestFocus();
+        enter.setForeground(Color.BLACK);
+        accountMenu.setForeground(Color.BLACK);
+        accountMenu.setBackground(Color.DARK_GRAY);
+        accountMenu.add(loginItem);
+        accountMenu.add(createAccountItem);
+        accountMenu.add(logoutMenuItem);
+        accountMenu.add(averageGuessesItem);
+        wordHelper.add(wordUnscramble);
+        wordHelper.setForeground(Color.BLACK);
+        wordHelper.setBackground(Color.DARK_GRAY);
+
+        editMenu.setForeground(Color.BLACK);
+        editMenu.setBackground(Color.DARK_GRAY);
+        editMenu.add(cutItem);
+        editMenu.add(copyItem);
+        editMenu.add(pasteItem);
+        
+        loginItem.setBackground(Color.DARK_GRAY);
+        createAccountItem.setBackground(Color.DARK_GRAY);
+        logoutMenuItem.setBackground(Color.DARK_GRAY);
+        averageGuessesItem.setBackground(Color.DARK_GRAY);
+
+        loginItem.setForeground(Color.WHITE);
+        createAccountItem.setForeground(Color.WHITE);
+        logoutMenuItem.setForeground(Color.WHITE);
+        averageGuessesItem.setForeground(Color.WHITE);
+
+        cutItem.setBackground(Color.DARK_GRAY);
+        copyItem.setBackground(Color.DARK_GRAY);
+        pasteItem.setBackground(Color.DARK_GRAY);
+
+        cutItem.setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
+        copyItem.setBorder(new MatteBorder(1, 0, 1, 0, Color.BLACK));
+        pasteItem.setBorder(new MatteBorder(0, 0, 1, 0, Color.BLACK));
+
+        menuBar.setBorder(new MatteBorder(0, 0, 1, 0, Color.BLACK));
+        menuBar.setBackground(Color.DARK_GRAY);
+        menuBar.add(editMenu);
+        menuBar.add(accountMenu);
+        menuBar.add(wordHelper);
+        
+        upArrow.setForeground(Color.WHITE);
+        downArrow.setForeground(Color.WHITE);
+
+        frame.setJMenuBar(menuBar);
+        popupMenu.setBackground(Color.DARK_GRAY);
+        popupMenu.setBorderPainted(false);
+        popupMenu.add(menuItemGiveUp);
+        popupMenu.add(menuItemRefresh);
+        popupMenu.add(menuItemClose);
+        popupMenu.add(menuItemHint);
+        popupMenu.add(menuItemHideKeyboard);
+
+        menuItemHint.setBackground(Color.WHITE);
+        menuItemClose.setBackground(Color.WHITE);
+        menuItemGiveUp.setBackground(Color.WHITE);
+        menuItemHideKeyboard.setBackground(Color.WHITE);
+        menuItemRefresh.setBackground(Color.WHITE);
+
+        menuItemHint.setForeground(Color.WHITE);
+
+        menuItemHint.setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
+        menuItemClose.setBorder(new MatteBorder(1, 0, 1, 0, Color.BLACK));
+        menuItemGiveUp.setBorder(new MatteBorder(0, 0, 1, 0, Color.BLACK));
+        menuItemHideKeyboard.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
+        menuItemRefresh.setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
+        
+        Border whiteBorder = BorderFactory.createLineBorder(Color.WHITE, 1);
+        Border blackBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+        enter.setBorder(blackBorder);
+
+        textField.setBounds(100,500,100,50);
+        textField.setBackground(Color.DARK_GRAY);
+        textField.setFont(null);
+        textField.setBorder(whiteBorder);
+        textField.setSelectedTextColor(Color.BLACK);
+        textField.setForeground(Color.WHITE);
+        textField.setCaretColor(Color.WHITE);
+        textField.setVisible(true);
+
+        button.setBackground(Color.GRAY);
+        button.setBorder(whiteBorder);
+        button.setBounds(275, 10, 95, 30);
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(false);
+        button.setForeground(Color.WHITE);
+
+        panel.setBackground(Color.DARK_GRAY);
+        panel.setBackground(Color.DARK_GRAY);
+        panel.add(textField);
+        panel.setSize(400,800);
+        panel.add(button);
+        panel.setLayout(null);
+
+        frame.add(panel);
+        frame.getContentPane().setBackground(Color.DARK_GRAY);
+        frame.setSize(400,800);
+        frame.setLayout(null);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    }  
+    private static void addFrameListener(){
+        frame.addKeyListener(new KeyListener() {
+            String output = "";
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                output = output + e.getKeyChar();
+                //updateKeyboardDiplay(output);
+                //updateAnswerDisplay();
+                
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+            
+        });
+    } 
+    private static void addActionListener(){
+        undoRedoActionListener();
+        editMenuActionListener();
+        accountMenuActionListener();
+        disableAccountMenu();
+
+        textField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+                if (((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)) {
+                    if ((e.getKeyCode() == KeyEvent.VK_W)) {
+                        Random random = new Random();
+                    
+                        try {
+                            Thread.sleep(random.nextInt(100,250));
+                        } catch (InterruptedException f) {
+                        }
+                        System.exit(0);
+                    }
+                    else if((e.getKeyCode() == KeyEvent.VK_R)){
+                    
+                        updateWindow();
+                    }
+                   
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                
+            }
+        });
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Update the label with the text from the JTextField
                 keyboardPrinted=true;
                 if (keyboardPrinted&&!textField.getText().equals("")) {
-                    j++;
                     usingKeyboard = true;
                     Scanner scanner = new Scanner(System.in);
                     currentGuess = textField.getText();
+                    keyboardPrinted = true;
                     compileResults(textField.getText(), j, scanner);
-                   
+                    j++;
                     scanner.close();
                     
                 }
@@ -286,57 +614,6 @@ public class WordleFiveLetter {
                 return;
             }
         });
-
-        KeyListener listener = new KeyListener() {
-            String keyboardInput = "";
-            @Override
-            public void keyPressed(KeyEvent f) {
-                
-                if (f.getKeyCode() == 10) {
-                    if (keyboardPrinted) {
-                        j++;
-                        usingKeyboard = true;
-                        Scanner scanner = new Scanner(System.in);
-                        currentGuess = keyboardInput;
-                        compileResults(keyboardInput, j, scanner);
-                       
-                        scanner.close();
-                        keyboardInput = "";
-                    }
-                    
-                    
-                    
-                    return;
-                    
-                }
-                else if(f.getKeyCode()==8){
-                    keyboardPrinted=true;
-                    StringBuffer temp = new StringBuffer(keyboardInput);
-                    try {
-                        temp.deleteCharAt(temp.length()-1);
-                    } catch (Exception e) {
-                    }
-                    keyboardInput = temp.toString();
-                    printGuesses(keyboardInput, false);
-                }
-                else {
-                    keyboardPrinted = true;
-                    keyboardInput = keyboardInput+f.getKeyChar();
-                    printGuesses(keyboardInput, false);
-                    //return guess, reduce guesses by one and call method.
-                }
-                
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-        };
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -356,47 +633,902 @@ public class WordleFiveLetter {
                 }
                 
             }
-        }
-        );
+        });
+        frame.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    control = true;
 
-        Border border = BorderFactory.createLineBorder(Color.WHITE, 5);
-        textField.setBounds(100,100,100,50);
-        textField.setBackground(Color.GRAY);
-        textField.setFont(null);
-        textField.setBorder(border);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    control = true;
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+        menuItemRefresh.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateKeyboard();
+            }
+        });
+        menuItemHint.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String conformation = "Are you sure you would like a hint?";
+                String panelName = "Hint Confirmation";
+                int output  = JOptionPane.showConfirmDialog(frame, conformation, panelName,0 );
+                if (output == 0) {
+                    panel.remove(button);
+                    frame.add(panel);
+                    frame.revalidate();
+                    frame.repaint();
+                    createHint(output);
+                
+                    
+                    frame.setSize(frame.getWidth()-1, frame.getHeight()-1);
+                    frame.setSize(frame.getWidth()+1, frame.getHeight()+1);
+                }
+            }
+        });
+        menuItemClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        menuItemGiveUp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Scanner scanner = new Scanner(System.in);
+                endProgram(scanner, false);
+            }
+        });
         
-        button.setBackground(Color.GRAY);
-        button.setBorder(border);
-        button.setBounds(150, 25, 95, 30);
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setForeground(Color.WHITE);
+        
+        menuItemHideKeyboard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                
+                if (control) {
+                    
+                    if (keyboardDisplayed) {
+                        A.setText("A");
+                        B.setText("B");
+                        C.setText("C");
+                        D.setText("D");
+                        E.setText("E");
+                        F.setText("F");
+                        G.setText("G");
+                        H.setText("H");
+                        I.setText("I");
+                        J.setText("J");
+                        K.setText("K");
+                        L.setText("L");
+                        M.setText("M");
+                        N.setText("N");
+                        O.setText("O");
+                        P.setText("P");
+                        Q.setText("Q");
+                        R.setText("R");
+                        S.setText("S");
+                        T.setText("T");
+                        U.setText("U");
+                        V.setText("V");
+                        W.setText("W");
+                        X.setText("X");
+                        Y.setText("Y");
+                        Z.setText("Z");
+                        
+                        frame.getContentPane().setBackground(Color.DARK_GRAY);
+                        frame.setSize(300,200);
+                        frame.setLayout(null);
+                        frame.revalidate();
+                        frame.repaint();
+                        frame.setVisible(true);
+                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        keyboardDisplayed = false;
+                        control = false;
+                        updateKeyboard();
+                    }
+                    else{
+                        A.setText("");
+                        B.setText("");
+                        C.setText("");
+                        D.setText("");
+                        E.setText("");
+                        F.setText("");
+                        G.setText("");
+                        H.setText("");
+                        I.setText("");
+                        J.setText("");
+                        K.setText("");
+                        L.setText("");
+                        M.setText("");
+                        N.setText("");
+                        O.setText("");
+                        P.setText("");
+                        Q.setText("");
+                        R.setText("");
+                        S.setText("");
+                        T.setText("");
+                        U.setText("");
+                        V.setText("");
+                        W.setText("");
+                        X.setText("");
+                        Y.setText("");
+                        Z.setText("");
+                        keyboardDisplayed = true;
+                        control = false;
+                    }
+                    updateKeyboard();
 
-        panel.setBackground(Color.DARK_GRAY);
-        panel.setBackground(Color.DARK_GRAY);
-        panel.add(textField);
-        panel.setSize(280,200);
-        panel.add(button);
-        panel.setLayout(null);
+                }
+                
+                
 
-        frame.add(panel);
-        frame.addKeyListener(listener);
-        frame.getContentPane().setBackground(Color.DARK_GRAY);
-        frame.setSize(300,200);
-        frame.setLayout(null);
-        frame.revalidate();
-        frame.repaint();
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
-    } 
-    
+            }
+        });
+    }
+    private static void keyBoardActionListener(){
+        A.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'A');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        B.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'B');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        C.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'C');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        D.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'D');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        E.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'E');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        F.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'F');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        G.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'G');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        H.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'H');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        I.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'I');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        J.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'J');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        K.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'K');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        L.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'L');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        M.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'M');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        N.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'N');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        O.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'O');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        P.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'P');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        Q.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'Q');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        R.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'R');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        S.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'S');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        T.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'T');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        U.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'U');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        V.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'V');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        W.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'W');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        X.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'X');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        Y.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'Y');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        Z.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                textField.setText(textField.getText()+'Z');
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        enter.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                keyboardPrinted=true;
+                if (keyboardPrinted&&!textField.getText().equals("")) {
+                    
+                    usingKeyboard = true;
+                    Scanner scanner = new Scanner(System.in);
+                    currentGuess = textField.getText();
+                    compileResults(textField.getText(), j, scanner);
+                    j++;
+                    scanner.close();
+                    
+                }
+                
+                
+                textField.setText("");
+                return;
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+               
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                
+            }
+        });
+        backspace.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                StringBuffer lastChar  = new StringBuffer(textField.getText());
+                try {
+                    lastChar.deleteCharAt(lastChar.length()-1);
+                } catch (Exception f) {
+                }
+                textField.setText(lastChar.toString());
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
+        downArrow.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                scrollDown();
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        upArrow.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                scrollUp();
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+    }
+    private static void accountMenuActionListener(){
+        loginItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog loginDialog = new JDialog(frame, "Login", true);
+                loginDialog.setSize(300, 150);
+                loginDialog.setLayout(new GridLayout(3, 2));
+
+                JLabel userLabel = new JLabel("Username:");
+                JTextField userField = new JTextField();
+                JLabel passLabel = new JLabel("Password:");
+                JPasswordField passField = new JPasswordField();
+                JButton submitButton = new JButton("Submit");
+
+                loginDialog.add(userLabel);
+                loginDialog.add(userField);
+                loginDialog.add(passLabel);
+                loginDialog.add(passField);
+                loginDialog.add(new JLabel()); // Empty cell
+                loginDialog.add(submitButton);
+
+                submitButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String username = userField.getText();
+                        String password = new String(passField.getPassword());
+                        Path filePath = Paths.get("wordleAccountData.txt");
+                        try {
+                            List<String> lines = Files.readAllLines(filePath);
+                            for(int k = 0; k < lines.size(); k++) {
+                                lines.set(k, decryptText(lines.get(k)));
+                            }
+                            if (lines.contains(username)) {
+                                if (lines.get(lines.indexOf(username)+1).equals(password)) {
+                                    accountLoggedIn = true;
+                                    currentUser = username;
+                                    disableAccountMenu();
+                                    System.out.println("PASSWORD CORRECT");
+                                    loginDialog.dispose();
+                                }
+                            }
+                            
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        loginDialog.dispose();
+                    }
+                });
+                loginDialog.setVisible(true);
+                
+            }
+        });
+        createAccountItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog loginDialog = new JDialog(frame, "Account Creation", true);
+                loginDialog.setSize(300, 150);
+                loginDialog.setLayout(new GridLayout(3, 2));
+
+                JLabel userLabel = new JLabel("Username:");
+                JTextField userField = new JTextField();
+                JLabel passLabel = new JLabel("Password:");
+                JPasswordField passField = new JPasswordField();
+                JButton submitButton = new JButton("Submit");
+
+                loginDialog.add(userLabel);
+                loginDialog.add(userField);
+                loginDialog.add(passLabel);
+                loginDialog.add(passField);
+                loginDialog.add(new JLabel()); // Empty cell
+                loginDialog.add(submitButton);
+
+                submitButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String username = userField.getText();
+                        String password = new String(passField.getPassword());
+                        try {
+                            Path filePath = Paths.get("wordleAccountData.txt");
+                            List<String> lines = Files.readAllLines(filePath);
+                            for(int k = 0; k < lines.size(); k++){
+                                lines.set(k, decryptText(lines.get(k)));
+                            }
+                            if (lines.contains(username)) {
+                                System.out.println("Username Taken");
+                            }
+                            else{
+                                lines.add(username);
+                                lines.add(password);
+                                createUser(username);
+                                SecretKey secretKey = generateKey(128);
+                                Files.write(Paths.get("secretKey.txt"), Base64.getEncoder().encode(secretKey.getEncoded()));
+                                for(int k = 0; k<lines.size();k++){
+                                    lines.set(k, encrypt(lines.get(k), secretKey));
+                                }
+                                Files.write(filePath, lines);
+                                loginDialog.dispose();
+                            }
+                        } catch (Exception e1) {
+                        }
+                        
+                    }
+             });
+                loginDialog.setVisible(true);
+                
+            }
+        });
+        logoutMenuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+                System.out.println("Account Logged Out");
+				currentUser="";
+                accountLoggedIn = false;
+                disableAccountMenu();
+			}
+            
+        });
+        averageGuessesItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getAverageGuesses();
+			}
+            
+        });
+
+        
+    }
+    private static void disableAccountMenu(){
+        if (accountLoggedIn) {
+            loginItem.setEnabled(false);
+            logoutMenuItem.setEnabled(true);
+            averageGuessesItem.setEnabled(true);
+        }
+        else{
+            logoutMenuItem.setEnabled(false);
+            averageGuessesItem.setEnabled(false);
+            loginItem.setEnabled(true);
+
+        }
+    }
+    private static void createUser(String username){
+        Path filePath = Paths.get("wordleUserData.txt");
+        try {
+			List<String> lines = Files.readAllLines(filePath);
+            lines.add(username);
+            lines.add("0");
+            lines.add("");
+            lines.add("0");
+            lines.add("100");
+            lines.add("0");
+            Files.write(filePath, lines);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        return;
+    }
+    private static void updateStatistics(boolean win){
+        if (!accountLoggedIn) {
+            return;
+        }
+        Path filePath = Paths.get("wordleUserData.txt");
+        try {
+			List<String> lines = Files.readAllLines(filePath);
+            lines.set(lines.indexOf(currentUser)+1, ""+(Integer.parseInt(lines.get(lines.indexOf(currentUser)+1))+1));
+            if (win&&mode!=3) {
+                lines.set(lines.indexOf(currentUser)+2, lines.get(lines.indexOf(currentUser)+2)+(guessNumber-1)+",");
+                lines.set(lines.indexOf(currentUser)+3, ""+(Integer.parseInt(lines.get(lines.indexOf(currentUser)+3))+1));    
+                if (Integer.parseInt(lines.get(lines.indexOf(currentUser)+4))>guessNumber-1) {
+                    lines.set(lines.indexOf(currentUser)+4, (guessNumber-1)+"");
+                } 
+                if (highScoreBeaten) {
+                    lines.set(lines.indexOf(currentUser)+5, ""+(Integer.parseInt(lines.get(lines.indexOf(currentUser)+5))+1));
+                } 
+            }
+            Files.write(filePath, lines);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    private static double getAverageGuesses() {
+        Path filePath = Paths.get("wordleUserData.txt");
+        try {
+			List<String> lines = Files.readAllLines(filePath);
+            String input = lines.get(lines.indexOf(currentUser)+2);
+            if (input.equals("")) {
+                System.out.println("ERROR: NO DATA FOUND");
+                return 0;
+            }
+            String[] splitedInput = input.split(",");
+            double output = 0;
+            for(int k = 0; k<splitedInput.length;k++) {
+                output += Double.parseDouble(splitedInput[k]);
+            }
+            output = output/(splitedInput.length);
+            output = Math.round(output*1000);
+            System.out.println("Your average time to solve is "+output/1000+" guesses.");
+            return output/1000;
+		} catch (IOException e) {
+            
+		}
+        System.out.println("ERROR: NO DATA FOUND");
+        return 0;
+    }
+    private static String encrypt(String strToEncrypt, SecretKey secretKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] encryptedBytes = cipher.doFinal(strToEncrypt.getBytes());
+
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (Exception e) {
+        }
+        return "";
+        
+    }
+    private static SecretKey generateKey(int n) throws Exception {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(n);
+        return keyGenerator.generateKey();
+    }
+    private static String decryptText(String strToDecrypt) {
+        try {
+            byte[] secretKeyBytes = Base64.getDecoder().decode(Files.readAllBytes(Paths.get("secretKey.txt")));
+            SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(strToDecrypt));
+            return new String(decryptedBytes);
+        } catch (Exception e) {
+        }
+        return "";
+    }
+    private static void editMenuActionListener(){
+        cutItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textField.cut();
+                
+            }
+        });
+
+        copyItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textField.copy();
+            }
+        });
+
+        pasteItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textField.paste();
+            }
+        });
+    }
+    private static void undoRedoActionListener(){
+        
+        textField.getDocument().addUndoableEditListener(new UndoableEditListener() {
+            public void undoableEditHappened(UndoableEditEvent e) {
+                undoManager.addEdit(e.getEdit());
+            }
+        });
+
+        Action undoAction = new AbstractAction("Undo") {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (undoManager.canUndo()) {
+                        undoManager.undo();
+                    }
+                } catch (CannotUndoException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
+
+        Action redoAction = new AbstractAction("Redo") {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (undoManager.canRedo()) {
+                        undoManager.redo();
+                    }
+                } catch (CannotRedoException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
+
+        textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "Undo");
+        textField.getActionMap().put("Undo", undoAction);
+        
+        textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "Redo");
+        textField.getActionMap().put("Redo", redoAction);
+    }
     private static void createHint(int giveHint){
         if (giveHint == 0) {
             Random random = new Random();
-            int hintType = random.nextInt(4);
-            hintType = 1;
-            
+            int hintType = random.nextInt(3);
+    
             if (hintType==0) {
                 getVowels();
                 return;
@@ -404,9 +1536,11 @@ public class WordleFiveLetter {
             else if (hintType ==1) {
                 //find word with similiar chars.
                 similarWord();
+                return;
             }
             else if(hintType ==2) {
-                
+                revealYellow();
+                return;
             }
             else{
 
@@ -459,10 +1593,9 @@ public class WordleFiveLetter {
         hintPanel.add(label);
         System.out.println("The answer contians "+numOfVowels+" vowels!");
         return;
-    }
-    
+    } 
     private static void similarWord(){
-        
+         
         StringBuffer tempAnswer = new StringBuffer(answer);
         try {
             Path filePath = Paths.get("wordleInputData.txt");
@@ -508,6 +1641,21 @@ public class WordleFiveLetter {
         }
         return;
     }
+    private static void revealYellow() {
+        ArrayList<Character> possibleAnswers = new ArrayList<Character>();
+        Random random = new Random();
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String tempAnswer = answer;
+        tempAnswer = tempAnswer.toUpperCase();
+        for (int k = 0; k < 26; k++) {
+            if (tempAnswer.contains(""+alphabet.charAt(k))&&letterIndex.get(alphabet.charAt(k))==0) {
+                
+                possibleAnswers.add(alphabet.charAt(k));
+            }
+        }
+        Character output = possibleAnswers.get(random.nextInt(possibleAnswers.size()));
+        System.out.println("The answer contains the letter '"+output+"'.");
+    }
     private static void updateKeyboard() {
         if (temp == 0) {
             
@@ -516,6 +1664,7 @@ public class WordleFiveLetter {
             setFont();
             setPosition();
             add();
+           
             updateWindow(); 
         }
         else {
@@ -542,6 +1691,7 @@ public class WordleFiveLetter {
                 
                         if (highScore > guessNumber) {
                             System.out.println("Congratulations you beat the highscore of " + highScore + " guesses!");
+                            highScoreBeaten = true;
                             lines.set(lines.indexOf(answer) +1, "" + (guesses));
                             Files.write(filePath, lines);
                             return;
@@ -577,65 +1727,60 @@ public class WordleFiveLetter {
         }
         
     }
-    private static int numberOfGuesses(Scanner scanner) {
-        int guesses = -1;
-        
-        while (guesses < 0) {
-            //Scanner scanner1 = new Scanner(System.in);
-            try {
-                guesses = scanner.nextInt();
-                if (guesses < 1) {
-                    return 6;
-                }
-                else if (guesses > 100) {
-                    return 6;
-                }
-            } catch (Exception e) {
-                
-                return 6;
-
-            }
+    private static int getNumOfGuesses(Scanner scanner) {
+        Object[] options = {4, 6,8,10,15,20,25};
+        int choice = -1;
+        while (choice == -1) {
+            choice = JOptionPane.showOptionDialog(frame, "How many guesses would you like?", "Guesses",
+            JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
         }
-        return guesses;
+        if (choice == 0) {
+            return 4;
+        }
+        else if (choice==1){
+            return 6;
+        }
+        else if (choice==2){
+            return 8;
+        }
+        else if (choice==3){
+            return 10;
+        }
+        else if (choice==4){
+            return 15;
+        }
+        else if (choice==5){
+            return 20;
+        }
+        else if (choice == 6){
+            return 25;
+        }
+        return 6;
             
     }   
     private static Boolean wordType(Scanner scanner) {
         
-        String input = scanner.nextLine();
-        input = prepareWord(input, false);
-        if (input.equals("")) {
+        Object[] options = {"Random", "Custom"};
+        int choice = -1;
+        String word = "a";
+        while (choice == -1) {
+            choice = JOptionPane.showOptionDialog(frame, "Would you like a Random or Custom Word?", "Word Type",
+            JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        }
+        if (choice == 0) {
             return true;
         }
-        if (input.equals("random")) {
-            return true;
-        }
-        if (input.equals("dev")) {
-            mode = 2;
-            return true;
-        }
-        else if (input.equals("custom")) {
-            printer.print("What would you like the word to be?");
-            String k = "";
-            while(k.length() != 5) {
-                printer.print("Please enter a five letter word");
-                k = scanner.nextLine();
-                //k = k.replaceAll("[^a-zA-Z]", "");
-                if (k.length() == 5) {
-                    answer = k;
-                    mode = 3;
-                    return false;
-                }
+        else if (choice == 1){
+            word = JOptionPane.showInputDialog("What would you like the word to be?");
+            while (word==null||word.length() != 5) {
+                JOptionPane.showMessageDialog(frame, "Please enter a five letter word.");
+                word = JOptionPane.showInputDialog("What would you like the word to be?");
             }
-            
-            
-            
-            
-        } else {
-            printSpaces();
-        
-            quickFix = true;
+            answer = word;
+            mode = 3;
+            return false;
         }
-        return false;
+        return true;
     }
     private static void chooseWord(Scanner scanner) {
         System.out.println("Would you like to choose your word, or have a random word generated?");
@@ -688,6 +1833,7 @@ public class WordleFiveLetter {
                 return true;
             }
         } catch (Exception e) {
+            
         }
         return false;
     }
@@ -708,6 +1854,7 @@ public class WordleFiveLetter {
     }
     private static String convertToWord (String result, String input) {
         String output = "";
+
         for(int k = 0; k < 5; k++) {
             if (result.charAt(k) == 'G') {
                 output = output + ANSI_GREEN + input.charAt(k) + ANSI_RESET;
@@ -731,6 +1878,7 @@ public class WordleFiveLetter {
             guessNumber=guessNumber+1;
             keyboardPrinted = false;
             printSpaces();
+
             for(int k = 1; k < guessNumber+1; k++) {
                 if (!storedGuesses[k].equals("")) {
                     System.err.println(storedGuesses[k]);
@@ -763,6 +1911,7 @@ public class WordleFiveLetter {
     }
     private static int getChars(Character character, String input){
         int count = 0;
+
         for(int k = 0; k < input.length(); k++){
             if (input.charAt(k) == character) {
                 count++;
@@ -869,21 +2018,82 @@ public class WordleFiveLetter {
             return false;
         }
     } 
+    private static void scrollDown(){
+        if (displayNumber<j-4){
+            displayNumber++;
+            guessIndex.set(0, trueGuessIndex.get(displayNumber-1));
+            guessIndex.set(1, trueGuessIndex.get(displayNumber));
+            guessIndex.set(2, trueGuessIndex.get(displayNumber+1));
+            guessIndex.set(3, trueGuessIndex.get(displayNumber+2));
+            guessIndex.set(4, trueGuessIndex.get(displayNumber+3));
+            guessIndex.set(5, trueGuessIndex.get(displayNumber+4));
+
+            answerIndex.set(0, trueAnswerIndex.get(displayNumber-1));
+            answerIndex.set(1, trueAnswerIndex.get(displayNumber));
+            answerIndex.set(2, trueAnswerIndex.get(displayNumber+1));
+            answerIndex.set(3, trueAnswerIndex.get(displayNumber+2));
+            answerIndex.set(4, trueAnswerIndex.get(displayNumber+3));
+            answerIndex.set(5, trueAnswerIndex.get(displayNumber+4));
+
+
+        }
+        else{
+            return;
+        }
+        updateAnswerDisplay();
+        updateKeyboard();
+    }
+    private static void scrollUp(){
+        if (displayNumber>1){
+
+            displayNumber = displayNumber -1;
+            guessIndex.set(0, trueGuessIndex.get(displayNumber-1));
+            guessIndex.set(1, trueGuessIndex.get(displayNumber));
+            guessIndex.set(2, trueGuessIndex.get(displayNumber+1));
+            guessIndex.set(3, trueGuessIndex.get(displayNumber+2));
+            guessIndex.set(4, trueGuessIndex.get(displayNumber+3));
+            guessIndex.set(5, trueGuessIndex.get(displayNumber+4));
+
+            answerIndex.set(0, trueAnswerIndex.get(displayNumber-1));
+            answerIndex.set(1, trueAnswerIndex.get(displayNumber));
+            answerIndex.set(2, trueAnswerIndex.get(displayNumber+1));
+            answerIndex.set(3, trueAnswerIndex.get(displayNumber+2));
+            answerIndex.set(4, trueAnswerIndex.get(displayNumber+3));
+            answerIndex.set(5, trueAnswerIndex.get(displayNumber+4));
+
+        }
+        else{
+            return;
+        }
+        updateAnswerDisplay();
+        updateKeyboard();
+    }
+    private static void updateLists(String input, String compiledResults){
+        answerIndex.set(j, input);
+        guessIndex.set(j, compiledResults);
+        trueAnswerIndex.set(j, input);
+        trueGuessIndex.set(j, compiledResults);
+        scrollDown();        
+    }
     private static void compileResults(String input, int guesses, Scanner scanner) {
-        
+        if (j>=numOfGuesses-1) {
+            endProgram(scanner, false);
+        }
         String currentGuess = input;
         currentGuess = prepareWord(currentGuess, true);
-        StringBuffer output = new StringBuffer(initDupes(input));
+        StringBuffer output = new StringBuffer(initDupes(currentGuess));
         current = output.toString();
         
-        
-        if (!checkIfRealWord(input)) {
+        if (!checkIfRealWord(currentGuess)) {
             j--;
             printGuesses("Please Enter A Valid Word", false);
             return;
         }
 
-        printGuesses(convertToWord(output.toString(), currentGuess), true);
+        updateLists(input, output.toString());
+        updateAnswerDisplay();
+
+        printGuesses(convertToWord(output.toString(), input), true);
         updateKeyboard();
         if (keepFirstGuess) {
             printGuesses(convertToWord(output.toString(), currentGuess), true);
@@ -893,7 +2103,8 @@ public class WordleFiveLetter {
         if(output.toString().equals("GGGGG")) {
             System.err.println("");
             updateHighscore(j, true);
-            endProgram(scanner);
+            updateStatistics(true);
+            endProgram(scanner, true);
                     
                     
             return;
@@ -902,24 +2113,43 @@ public class WordleFiveLetter {
         
         return;
     }
-    private static void endProgram(Scanner scanner) {
-        System.err.println("Congratulations!");
-        System.err.println("You have won!");
-        System.err.println("Thanks for playing!");
-        System.err.println("");
+    private static void endProgram(Scanner scanner, boolean win) {
+        if (win) {
+            System.err.println("Congratulations!");
+            System.err.println("You have won!");
+            System.err.println("Thanks for playing!");
+            System.err.println("");
+        }
+        else{
+            printer.print("");
+            printer.print("Out of Guesses :(");
+            printer.print("The word was " + answer + ".");
+            updateHighscore(99, false);
+            updateStatistics(false);
+            printer.print("Try Again Next Time!");
+            printer.print("");
+        }
+        
+
+        
+
         scanner.close();
         System.exit(0);
         
     }
+    
     public static void main(String[] args) throws Exception {
         
-        alphabet();
-        
+        initLists();
+        keyBoardActionListener();
+        updateAnswerDisplay();
+        updateWindow();
+        addActionListener();
         Scanner scanner = new Scanner(System.in);
         
         chooseWord(scanner);
 
-
+        
         
         if (quickFix) {
             printSpaces();
@@ -930,7 +2160,7 @@ public class WordleFiveLetter {
         
         printSpaces();
         printer.print("Please Input How Many Guesses You Would Like!");
-        int numOfGuesses = numberOfGuesses(scanner);
+        numOfGuesses = getNumOfGuesses(scanner);
         if (!usingKeyboard) {
             if (quickFix) {
                 printSpaces();
@@ -939,8 +2169,10 @@ public class WordleFiveLetter {
                 return;
             }
             else{
-                //updateKeyboard();
+                addFrameListener();
+                
                 for(j = 0; j <= numOfGuesses; j++) {
+
                     try {
                         currentGuess = scanner.nextLine(); 
                     } catch (Exception e) {
@@ -966,18 +2198,11 @@ public class WordleFiveLetter {
             //updateKeyboard();
             scanner.close();
         }
-        
+        endProgram(scanner, false);
         scanner.close();
-        printer.print("");
-        printer.print("Out of Guesses :(");
-        printer.print("The word was " + answer + ".");
-        updateHighscore(99, false);
-        printer.print("Try Again Next Time!");
-        printer.print("");
-        System.exit(0);
+       
         
     }
 }
 
-//jpopupmenu
-//restart,giveup,new hint
+//add tab where you can use a word unscrambeler, words ending with specific letter etc

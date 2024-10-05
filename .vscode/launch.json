@@ -1,0 +1,168 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "PrimeNumberFinder",
+            "request": "launch",
+            "mainClass": "PrimeNumberFinder",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "PongGame",
+            "request": "launch",
+            "mainClass": "PongGame",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Pong",
+            "request": "launch",
+            "mainClass": "Pong",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "DecryptText",
+            "request": "launch",
+            "mainClass": "DecryptText",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "EncryptText",
+            "request": "launch",
+            "mainClass": "EncryptText",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "UndoRedoExample",
+            "request": "launch",
+            "mainClass": "UndoRedoExample",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "JMenuBarWithTextFieldExample",
+            "request": "launch",
+            "mainClass": "JMenuBarWithTextFieldExample",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "A",
+            "request": "launch",
+            "mainClass": "A",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "ShortcutKeyListenerExample",
+            "request": "launch",
+            "mainClass": "ShortcutKeyListenerExample",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "KeyListenerExample",
+            "request": "launch",
+            "mainClass": "KeyListenerExample",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "AnagramDetector",
+            "request": "launch",
+            "mainClass": "AnagramDetector",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "BubbleSort",
+            "request": "launch",
+            "mainClass": "BubbleSort",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "HashMapTest",
+            "request": "launch",
+            "mainClass": "HashMapTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Printer",
+            "request": "launch",
+            "mainClass": "Printer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "TypingTest",
+            "request": "launch",
+            "mainClass": "TypingTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "UniqueStringDetector",
+            "request": "launch",
+            "mainClass": "UniqueStringDetector",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "WordleFiveLetter",
+            "request": "launch",
+            "mainClass": "WordleFiveLetter",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "WordleThreeLetter",
+            "request": "launch",
+            "mainClass": "WordleThreeLetter",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "printWriterTest",
+            "request": "launch",
+            "mainClass": "printWriterTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "scannerTest",
+            "request": "launch",
+            "mainClass": "scannerTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "test",
+            "projectName": "javaProjects_a422883c"
+        }
+    ]
+}

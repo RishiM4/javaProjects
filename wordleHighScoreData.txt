@@ -411,7 +411,7 @@ berth
 beset
 24
 betel
-24
+5
 bevel
 24
 bezel
@@ -853,7 +853,7 @@ climb
 cling
 24
 clink
-24
+6
 cloak
 24
 clock
@@ -905,7 +905,7 @@ conch
 condo
 24
 conic
-24
+5
 coral
 24
 corer
@@ -1123,7 +1123,7 @@ deuce
 devil
 24
 diary
-24
+4
 dicey
 24
 digit
@@ -1657,7 +1657,7 @@ froth
 frown
 24
 froze
-24
+3
 fruit
 24
 fudge
@@ -1909,7 +1909,7 @@ gusto
 gusty
 24
 gypsy
-24
+2
 habit
 24
 hairy
@@ -2065,7 +2065,7 @@ iliac
 imbue
 24
 impel
-24
+5
 imply
 24
 inane
@@ -2283,7 +2283,7 @@ limit
 linen
 24
 liner
-24
+5
 lingo
 24
 lipid
@@ -2481,7 +2481,7 @@ miner
 minim
 24
 minor
-24
+3
 minty
 24
 minus
@@ -2667,7 +2667,7 @@ offal
 offer
 24
 often
-24
+7
 olden
 24
 older
@@ -3093,7 +3093,7 @@ rayon
 razor
 24
 reach
-24
+2
 react
 24
 ready
@@ -3281,7 +3281,7 @@ sandy
 saner
 24
 sappy
-24
+4
 sassy
 24
 satin
@@ -3425,7 +3425,7 @@ shawl
 shear
 24
 sheen
-24
+4
 sheep
 24
 sheer
@@ -3479,7 +3479,7 @@ showy
 shrew
 24
 shrub
-24
+5
 shrug
 24
 shuck
@@ -3677,7 +3677,7 @@ sooty
 sorry
 24
 sound
-24
+6
 south
 24
 space
@@ -3789,7 +3789,7 @@ stair
 stake
 24
 stale
-24
+4
 stalk
 24
 stall
@@ -4325,7 +4325,7 @@ urine
 usage
 24
 usher
-24
+4
 using
 24
 usual
@@ -4559,7 +4559,7 @@ woven
 wrack
 24
 wrath
-24
+5
 wreak
 24
 wreck
@@ -4595,6 +4595,6 @@ youth
 zebra
 24
 zesty
-24
+3
 zonal
 24
