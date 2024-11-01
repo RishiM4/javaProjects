@@ -1,9 +1,6 @@
 import java.util.Arrays;
 import java.util.Scanner;
 public class AnagramDetector {
-    
-
-   
 
     private static StringBuilder sort(String input) {
         input = input.toLowerCase();
