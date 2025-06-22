@@ -1,0 +1,8 @@
+Network is which computer systems are connected together in some way. 
+Modem means modulator demodulator and is a device.
+A modem converts a computer's digital signal in to an analogue and vice versa; 
+externall internall, wireless, fax, dial-up, DLS, ISDN
+Hubs are hardware devices that are often used to connect togenther a number of decices to form a LAN
+Switches distrubute packets of data to specified devices to form a lan.
+point-to-point, bus, star, mesh, linear, hybrid, tree, ring
+network downtime, waek signal or low badnwidth, routing problems
