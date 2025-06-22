@@ -12,6 +12,7 @@ public class Printer {
     }
     public void print(StringBuilder input){
         System.err.println(input);
+        
     }
     public void print(Boolean input){
         System.err.println(input);

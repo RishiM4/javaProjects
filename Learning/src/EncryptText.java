@@ -18,7 +18,6 @@ public class EncryptText {
 
         for(int k = 0; k < lines.size(); k++){
             lines.set(k, encrypt(lines.get(k), secretKey));
-            System.out.println("ASJDKSAJDLKAJDKASLD");
         }
         System.out.println(lines);
        

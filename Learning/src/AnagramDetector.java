@@ -7,13 +7,14 @@ public class AnagramDetector {
         input = input.replaceAll(" ", "");
         char[] temp = input.toCharArray();
         Arrays.sort(temp);
+        System.out.println(new String(temp));
         StringBuilder sorted = new StringBuilder(new String(temp));
         return sorted;
     }
 
     public static void main(String[] args) throws Exception {
-        test test = new test();
-        test.keyPressed(null);
+        
+        
         try (Scanner scan = new Scanner(System.in)) {
             Printer printer = new Printer();
 

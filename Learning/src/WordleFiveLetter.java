@@ -7,12 +7,29 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.CannotRedoException;
+import javax.swing.*;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import java.awt.event.MouseAdapter;
@@ -24,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +80,7 @@ public class WordleFiveLetter {
     static JLabel P= new JLabel("P");
     static JLabel Q= new JLabel("Q");
     static JLabel R= new JLabel("R");//COOLEST LETTER IN THE WORLD
-    static JLabel S= new JLabel("S");//not so cool letter, only if your name starts with it
+    static JLabel S= new JLabel("S");//not so cool letter if your name starts with it
     static JLabel T= new JLabel("T");
     static JLabel U= new JLabel("U");
     static JLabel V= new JLabel("V");
@@ -77,7 +95,7 @@ public class WordleFiveLetter {
     static Image imageBackspaceIcon = originalBackspaceIcon.getImage();
     static ImageIcon backspaceIcon = new ImageIcon(imageBackspaceIcon.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
     static JLabel backspace = new JLabel(backspaceIcon);
-    static JFrame frame = new JFrame("Keyboard Display");
+    static JFrame frame = new JFrame("Wordle - By Rishi Mohan");
     static JPanel panel = new JPanel();
     static JTextField textField = new JTextField(20);
     static JPopupMenu popupMenu = new JPopupMenu();
@@ -91,6 +109,8 @@ public class WordleFiveLetter {
     static JMenu editMenu = new JMenu("Edit");
     static JMenu wordHelper = new JMenu("Word Helper");
     static JMenuItem wordUnscramble = new JMenuItem("Unscramble Word");
+    static JMenuItem wordContains = new JMenuItem("Word Contains");
+    static JMenuItem wordStartsWith = new JMenuItem("Word Starts With");
     static JMenuItem cutItem = new JMenuItem("Cut");
     static JMenuItem copyItem = new JMenuItem("Copy");
     static JMenuItem pasteItem = new JMenuItem("Paste");
@@ -117,6 +137,7 @@ public class WordleFiveLetter {
     static int displayNumber = 1;
     static HashMap<Integer, Rectangle> boxPositions = new HashMap<Integer, Rectangle>();
     static JPanel displayPanel = new JPanel();
+    static final Long startTime = System.currentTimeMillis();
 
     private static void setFont() {
         Font customFont = new Font("Arial",Font.BOLD, 30);
@@ -437,7 +458,10 @@ public class WordleFiveLetter {
         accountMenu.add(createAccountItem);
         accountMenu.add(logoutMenuItem);
         accountMenu.add(averageGuessesItem);
+
         wordHelper.add(wordUnscramble);
+        wordHelper.add(wordContains);
+        wordHelper.add(wordStartsWith);
         wordHelper.setForeground(Color.BLACK);
         wordHelper.setBackground(Color.DARK_GRAY);
 
@@ -488,8 +512,7 @@ public class WordleFiveLetter {
         menuItemGiveUp.setBackground(Color.WHITE);
         menuItemHideKeyboard.setBackground(Color.WHITE);
         menuItemRefresh.setBackground(Color.WHITE);
-
-        menuItemHint.setForeground(Color.WHITE);
+        menuItemHint.setBackground(Color.WHITE);
 
         menuItemHint.setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
         menuItemClose.setBorder(new MatteBorder(1, 0, 1, 0, Color.BLACK));
@@ -501,9 +524,9 @@ public class WordleFiveLetter {
         Border blackBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
         enter.setBorder(blackBorder);
 
+        
         textField.setBounds(100,500,100,50);
         textField.setBackground(Color.DARK_GRAY);
-        textField.setFont(null);
         textField.setBorder(whiteBorder);
         textField.setSelectedTextColor(Color.BLACK);
         textField.setForeground(Color.WHITE);
@@ -560,8 +583,9 @@ public class WordleFiveLetter {
         undoRedoActionListener();
         editMenuActionListener();
         accountMenuActionListener();
+        wordHelperActionListener();
         disableAccountMenu();
-
+        
         textField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -776,6 +800,197 @@ public class WordleFiveLetter {
 
             }
         });
+    }
+    private static void wordHelperActionListener(){
+        wordUnscramble.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent g) {
+                String word = "";
+                word = JOptionPane.showInputDialog("Please Enter a Word");
+                
+                try {
+                    while(word.length()!=5){
+                        JOptionPane.showMessageDialog(frame, "Please enter a five letter word."); 
+                        word = JOptionPane.showInputDialog("Please Enter a Word");
+                    }
+                } catch (Exception e) {
+                    return;
+                }
+                ArrayList<String> output = unscrambleWord(word);
+                if (output.size()==0) {
+                    JOptionPane.showMessageDialog(frame, "No Words Found"); 
+                    return;
+                }
+                String message = "";
+                for(int k =0; k < output.size();k++){
+                    if (message.equals("")){
+                        message = output.get(k);
+                        
+                    }
+                    else{
+                        message = message + ", " + output.get(k);
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "Unscrambled Words: "+message); 
+
+
+            }
+            
+        });
+        wordContains.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent g) {
+                String word = "";
+                word = JOptionPane.showInputDialog("Please Enter a Word");
+                
+                try {
+                    while(word.length()==0){
+                        JOptionPane.showMessageDialog(frame, "Please enter a five letter word."); 
+                        word = JOptionPane.showInputDialog("Please Enter a Word");
+                    }
+                } catch (Exception e) {
+                    return;
+                }
+                
+                ArrayList<String> output = checkWordContains(word);
+                if (output.size()==0) {
+                    JOptionPane.showMessageDialog(frame, "No Words Found"); 
+                    return;
+                }
+                String message = "";
+                for(int k =0; k < output.size();k++){
+                    if (message.equals("")){
+                        message = output.get(k);
+                        
+                    }
+                    else{
+                        message = message + ", " + output.get(k);
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "Unscrambled Words: "+message); 
+
+            }
+            
+        });
+        wordStartsWith.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent g) {
+                String word = "";
+                word = JOptionPane.showInputDialog("Please Enter a Word");
+                
+                try {
+                    while(word.length()==0){
+                        JOptionPane.showMessageDialog(frame, "Please enter a five letter word."); 
+                        word = JOptionPane.showInputDialog("Please Enter a Word");
+                    }
+                    ArrayList<String> output = checkWordStartsWith(word);
+                    if (output.size()==0) {
+                        JOptionPane.showMessageDialog(frame, "No Words Found"); 
+                        return;
+                    }
+                    String message = "";
+                    for(int k =0; k < output.size();k++){
+                        if (message.equals("")){
+                            message = output.get(k);
+                            
+                        }
+                        else{
+                            message = message + ", " + output.get(k);
+                        }
+                    }
+                    JOptionPane.showMessageDialog(frame, "Unscrambled Words: "+message); 
+                } catch (Exception e) {
+                    return;
+                }
+            }
+            
+        });
+    }
+    private static ArrayList<String> checkWordContains(String input){
+        ArrayList<String> output = new ArrayList<String>();
+        Boolean matches  = false;
+        try {
+            Path filePath = Paths.get("wordleAnswerData.txt");
+            List<String> lines = Files.readAllLines(filePath);
+            for(int k = 0; k < lines.size(); k++) {
+                matches = true;
+                for(int j = 0; j < input.length(); j++){
+                    if (!lines.get(k).contains((input.charAt(j))+"")) {
+                        matches = false;
+                    }
+                    
+                }
+                if (matches) {
+                    output.add(lines.get(k));
+                }
+            }
+        } catch (Exception e) {
+        }
+        if (output.size()>20) {
+            output = new ArrayList<String>();
+            output.add("Please Provide a More Concise Query");
+        }
+        return output;
+    }
+    private static ArrayList<String> unscrambleWord(String input){
+        ArrayList<String> output = new ArrayList<String>();
+        Path filePath = Paths.get("wordleAnswerData.txt");
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            String sortedInput = sortWord(input);
+            
+            for(int k =0; k < lines.size(); k++){
+                String tempWord = sortWord(lines.get(k));
+                if (sortedInput.equals(tempWord)) {
+                    output.add(lines.get(k));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (output.size()>20) {
+            output = new ArrayList<String>();
+            output.add("Please Provide a More Concise Query");
+        }
+        return output;
+    }
+    private static ArrayList<String> checkWordStartsWith(String input){
+        ArrayList<String> output = new ArrayList<String>();
+        Path filePath = Paths.get("words.txt");
+        boolean control = true;
+        try {
+			List<String> lines = Files.readAllLines(filePath);
+            
+            for (int k = 0; k < lines.size();k++) {
+                control = true;
+                for(int j = 0; j < input.length(); j++) {
+                    if (lines.get(k).charAt(j)!=input.charAt(j)) {
+                        control = false;
+                    }
+                    
+                }
+                if (control) {
+                    output.add(lines.get(k));
+                }
+
+            }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        if (output.size()>20) {
+            output = new ArrayList<String>();
+            output.add("Please Provide a More Concise Query");
+        }
+        return output;
+    }
+    private static String sortWord(String input) {
+        input = input.toLowerCase();
+        input = input.replaceAll(" ", "");
+        char[] temp = input.toCharArray();
+        Arrays.sort(temp);
+        return new String(temp);
     }
     private static void keyBoardActionListener(){
         A.addMouseListener(new MouseListener() {
@@ -1525,6 +1740,7 @@ public class WordleFiveLetter {
         textField.getActionMap().put("Redo", redoAction);
     }
     private static void createHint(int giveHint){
+        mode = 3;
         if (giveHint == 0) {
             Random random = new Random();
             int hintType = random.nextInt(3);
@@ -1579,18 +1795,14 @@ public class WordleFiveLetter {
             }
             
         }
-        JPanel hintPanel = new JPanel();
-        JLabel label = new JLabel("The answer contains "+numOfVowels+" vowels");
+        String message = "The answer contains "+numOfVowels+" vowels";
         
-        
+        JOptionPane.showMessageDialog(frame, "Hint "+message); 
+
 
         
         
-        label.setBounds(50, 50, 25, 25);
-        label.setForeground(Color.WHITE);
-        hintPanel.setBackground(Color.DARK_GRAY);
-        hintPanel.setBounds(0,100,250,250);
-        hintPanel.add(label);
+       
         System.out.println("The answer contians "+numOfVowels+" vowels!");
         return;
     } 
@@ -1633,7 +1845,12 @@ public class WordleFiveLetter {
             if (output.size()==0) {
                 similarWord();
             }
+            
             System.out.println("The word '"+output.get(random.nextInt(output.size()))+"' contains three letters in common with the answer.");
+            String message = "The word '"+output.get(random.nextInt(output.size()))+"' contains three letters in common with the answer.";
+            
+            JOptionPane.showMessageDialog(frame, "Hint "+message); 
+            
             return;
                 
         } catch (Exception e) {
@@ -1653,8 +1870,17 @@ public class WordleFiveLetter {
                 possibleAnswers.add(alphabet.charAt(k));
             }
         }
-        Character output = possibleAnswers.get(random.nextInt(possibleAnswers.size()));
-        System.out.println("The answer contains the letter '"+output+"'.");
+        try {
+            Character output = possibleAnswers.get(random.nextInt(possibleAnswers.size()));
+            System.out.println("The answer contains the letter '"+output+"'.");
+            String message = "The answer contains the letter '"+output+"'.";
+
+            JOptionPane.showMessageDialog(frame, "Hint "+message); 
+
+        } catch (Exception e) {
+        }
+        
+        
     }
     private static void updateKeyboard() {
         if (temp == 0) {
@@ -1728,7 +1954,7 @@ public class WordleFiveLetter {
         
     }
     private static int getNumOfGuesses(Scanner scanner) {
-        Object[] options = {4, 6,8,10,15,20,25};
+        Object[] options = {4, 6,8,"Custom"};
         int choice = -1;
         while (choice == -1) {
             choice = JOptionPane.showOptionDialog(frame, "How many guesses would you like?", "Guesses",
@@ -1744,17 +1970,27 @@ public class WordleFiveLetter {
             return 8;
         }
         else if (choice==3){
-            return 10;
+            int currentNumOfGuesses = -1;
+            String currentInput = "";
+            
+            while (currentNumOfGuesses == -1) {
+                currentInput = JOptionPane.showInputDialog("How many guesses would you like?");
+                try {
+                    int temp = Integer.parseInt(currentInput);
+                    if (temp < 0) {
+                        JOptionPane.showMessageDialog(frame, "Please input a number above 0"); 
+                    }
+                    else if (temp > 50) {
+                        JOptionPane.showMessageDialog(frame, "Please input a number below 50"); 
+                    }
+                    else {
+                        return temp;
+                    }
+                } catch (Exception e) {
+                }
+            }
         }
-        else if (choice==4){
-            return 15;
-        }
-        else if (choice==5){
-            return 20;
-        }
-        else if (choice == 6){
-            return 25;
-        }
+       
         return 6;
             
     }   
@@ -1772,11 +2008,11 @@ public class WordleFiveLetter {
         }
         else if (choice == 1){
             word = JOptionPane.showInputDialog("What would you like the word to be?");
-            while (word==null||word.length() != 5) {
-                JOptionPane.showMessageDialog(frame, "Please enter a five letter word.");
-                word = JOptionPane.showInputDialog("What would you like the word to be?");
+            if (word==null||word.length() != 5) {
+                wordType(scanner);
+                return false;
             }
-            answer = word;
+            answer = prepareWord(word, true);
             mode = 3;
             return false;
         }
@@ -1791,7 +2027,7 @@ public class WordleFiveLetter {
             Path filePath = Paths.get("wordleAnswerData.txt");
             try {
                 List<String> lines = Files.readAllLines(filePath);
-                answer = lines.get(random.nextInt(2296));
+                answer = lines.get(random.nextInt(9977));
             } catch (IOException e) {
                 e.printStackTrace();
                 answer = "words";
@@ -2119,6 +2355,10 @@ public class WordleFiveLetter {
             System.err.println("You have won!");
             System.err.println("Thanks for playing!");
             System.err.println("");
+            String message = "Congratulations, you have won!\nYou completed this wordle in "+(System.currentTimeMillis()-startTime)+"ms\nThanks for Playing!";
+            JOptionPane.showMessageDialog(frame, message); 
+            
+            
         }
         else{
             printer.print("");
@@ -2128,6 +2368,15 @@ public class WordleFiveLetter {
             updateStatistics(false);
             printer.print("Try Again Next Time!");
             printer.print("");
+            String message1 = "";
+            try {
+                Path filePath = Paths.get("wordleFiveLetterHighscores.txt");
+                List<String> lines = Files.readAllLines(filePath);
+                int highScore = Integer.parseInt(lines.get(lines.indexOf(answer)+1));
+                message1 = "Good Try! The highscore was " + highScore + "guesses.";
+            } catch (Exception e) {
+            }
+            JOptionPane.showMessageDialog(frame, "Out of Guesses :(\nThe word was "+answer +".\n"+message1+"\nTry again next time!"); 
         }
         
 
@@ -2205,4 +2454,6 @@ public class WordleFiveLetter {
     }
 }
 
-//add tab where you can use a word unscrambeler, words ending with specific letter etc
+//word starts with, word ends with, word exact contains
+//active word display(like show letters as you type)
+//categories for words

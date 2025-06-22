@@ -36,8 +36,7 @@ public class PrimeNumberFinder {
     private static void updateFile(){
         Path filePath = Paths.get("primeNumberData.txt");
         try {
-			List<String> lines = Files.readAllLines(filePath);
-            lines.clear();
+			List<String> lines = new ArrayList<String>();
             for(int k =0; k < list.size(); k++){
                 lines.add(""+list.get(k));
             }
@@ -80,7 +79,7 @@ public class PrimeNumberFinder {
                 System.exit(0);
             }
         };
-        timer.schedule(task, 60000);
+        timer.schedule(task, 600000);
         calandar = Calendar.getInstance();
         startTime = calandar.getTimeInMillis();
         while (timerActive) {

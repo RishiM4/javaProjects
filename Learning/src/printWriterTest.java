@@ -9,6 +9,7 @@ public class printWriterTest {
         Path filePath = Paths.get("insert name here");
         try {
 			List<String> lines = Files.readAllLines(filePath);
+            
             Files.write(filePath, lines);
 		} catch (IOException e) {
 			e.printStackTrace();

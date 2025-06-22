@@ -5,6 +5,7 @@ class scannerTest {
         try (Scanner scanner = new Scanner(System.in)) {
             String input =  scanner.nextLine();
             scanner.next();
+            scanner.close();
             return input;
         }
     } 
