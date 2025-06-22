@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MergeSort",
+            "request": "launch",
+            "mainClass": "MergeSort",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "PrimeNumberFinder",
             "request": "launch",
             "mainClass": "PrimeNumberFinder",
