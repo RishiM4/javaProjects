@@ -1,5 +1,3 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -226,7 +224,6 @@ public class AutoCorrect {
         
     }
     private static void checkWordDelete(String word, int depth){
-        String alphabet = "abcdefghijklmnopqrstuvwxyz";
         if (depth > 1) {
             return;
         }

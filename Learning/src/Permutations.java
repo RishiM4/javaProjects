@@ -3,7 +3,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class PermutationFinder {
+public class Permutations {
     private static ArrayList<String> findPermutations(StringBuilder current) {
         StringBuilder temp = new StringBuilder(current);
         ArrayList<String> results = new ArrayList<String>();

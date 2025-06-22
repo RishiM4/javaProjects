@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 
-public class pongTest {
+public class Pong {
 
     static Double x = 185.0; 
     static Double y = 175.0; 

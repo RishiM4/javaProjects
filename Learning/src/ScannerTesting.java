@@ -1,11 +1,10 @@
 import java.util.Scanner;
 
-class scannerTest {
+class ScannerTesting {
     public String ScanString(){
         try (Scanner scanner = new Scanner(System.in)) {
             String input =  scanner.nextLine();
             scanner.next();
-            scanner.close();
             return input;
         }
     } 

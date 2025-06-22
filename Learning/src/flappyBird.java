@@ -8,7 +8,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class flappyBird {
+public class FlappyBird {
     static JFrame frame = new JFrame();
     static Double obstacle1 = 0.0;
     static Double obstacle2 = 150.0;

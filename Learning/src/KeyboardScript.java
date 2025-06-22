@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-public class keyboardScriptTest {
+public class KeyboardScript {
     static Boolean startMacro = false;
     static long currentTime = System.currentTimeMillis();
     public static void main(String[] args) {

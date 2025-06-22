@@ -5,11 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Scanner;
 
-public class folderSync {
+public class Backups {
     private static void emptyFolder(String path){
         File directory = new File("C:\\javaBackups\\"+path);
         
@@ -71,13 +69,6 @@ public class folderSync {
         fileName = checkForDupe(fileName,0);
         
         emptyFolder(fileName+"\\Learning");        
-        
-        Path source = Paths.get("C:\\Users\\Rishi (New)\\javaProjects\\Learning\\src\\App.java");
-        Path destination = Paths.get("C:\\javaBackups\\"+fileName+"\\temp");
-        //emptyFolder(fileName+"\\temp");
-        
-
-
         traverse("",fileName+"\\Learning");
         
         try {

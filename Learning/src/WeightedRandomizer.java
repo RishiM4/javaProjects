@@ -36,7 +36,6 @@ public class WeightedRandomizer {
         return 0.0;
     }
     public static void main(String[] args) {
-        double input[] = {1,1,1,1};
         
 
         HashMap<Integer,Double> output = new HashMap<Integer,Double>();

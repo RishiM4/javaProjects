@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 // 0 1 2
 // 3 4 5
 // 6 7 8
-public class TicTacToeTest {
+public class TicTacToe {
     static int initialBoard[] = {0,0,0,0,0,0,0,0,0};
     static int turn = 1;
     static JFrame frame = new JFrame();
@@ -200,24 +200,7 @@ public class TicTacToeTest {
         }
         return results;
     }
-    private static void printBoard(int[] board){
-        String output[] = {"","","","","","","","",""};
-        for(int k = 0; k < 9; k++) {
-            if (board[k]==1) {
-                output[k] = "X";
-            }
-            else if (board[k]==-1) {
-                output[k] = "O";
-            
-            }
-            else {
-                output[k] = " ";
-            }
-        }
-        System.err.println(output[0]+" "+output[1]+" "+output[2]);
-        System.err.println(output[3]+" "+output[4]+" "+output[5]);
-        System.err.println(output[6]+" "+output[7]+" "+output[8]);
-    }
+   
     private static int findOptimalMoveX(int[] board) {
         ArrayList<Double> result = new ArrayList<Double>();
        
@@ -587,7 +570,6 @@ public class TicTacToeTest {
                     button10.setText("X COMPUTER");
                     oComputer = false;
                     resetBoard();
-                    double j = Math.random();
                     
 
                 }
