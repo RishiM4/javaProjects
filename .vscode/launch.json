@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CustomStack",
+            "request": "launch",
+            "mainClass": "CustomStack",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "AudioPlayerTest",
             "request": "launch",
             "mainClass": "AudioPlayerTest",
