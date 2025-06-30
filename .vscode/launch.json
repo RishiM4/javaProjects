@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AudioPlayerTest",
+            "request": "launch",
+            "mainClass": "AudioPlayerTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "StringCompression",
+            "request": "launch",
+            "mainClass": "StringCompression",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "DuplicateDetector",
+            "request": "launch",
+            "mainClass": "DuplicateDetector",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "BinarySearchInteger",
+            "request": "launch",
+            "mainClass": "BinarySearchInteger",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "MergeSort",
             "request": "launch",
             "mainClass": "MergeSort",
