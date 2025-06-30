@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class MergeSort {
+public class DuplicateDetector {
     private static Integer[] merge(Integer[] arr) {
         int m = (arr.length / 2);
         
@@ -50,15 +50,35 @@ public class MergeSort {
         return result.toArray(a);
         
     }
+    private static Integer search(Integer[] arr, int target) {
+        return search(arr, target, 0, arr.length-1,1);
+        
+    }
 
-    public static void main(String[] args) {
-        
-        Integer arr1[] = {5,6,1,6,8};
-        Integer arr[] = merge(arr1);
-        for(int i = 0; i < arr.length; i++) {
-            System.out.println(arr[i]);
+    private static Integer search(Integer[] arr, int target, int lb, int ub, int depth) {
+        int m = lb + (ub - lb) / 2;
+        if (arr[m] == target) {
+            return m;
+        } 
+        else if (lb == ub && arr[m] != target) {
+            return -1;
         }
-        
-        
+        else if (arr[m] > target){
+            search(arr, target, lb, m, depth+1);
+        }
+        else {
+            search(arr, target, m+1, ub, depth+1);
+        }
+        return -1;
+    }
+    public static void main(String[] args) {
+        Integer[] arr1 = {1,4,9,7,8,10,15};
+        Integer[] arr2= {5,20,17,8};
+        arr2 =  merge(arr2);
+        for(int i = 0; i < arr1.length; i++) {
+            if (search(arr2, arr1[i]) != -1) {
+                System.out.println(arr1[i]);
+            }
+        }
     }
 }
