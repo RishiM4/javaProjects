@@ -1,19 +1,16 @@
-public class CustomLinkedList extends RuntimeException{
-    private static Node startNode;
+public class CustomLinkedList<T> {
+    private Node<T> startNode;
 
-    private CustomLinkedList(String message, boolean t) {
-        super(message);
-    }
-    CustomLinkedList(String data) {
-        startNode = new Node(data);
+   
+    CustomLinkedList(T data) {
+        startNode = new Node<T>(data);
     }
     CustomLinkedList() {
-
     }
     
     public Integer size() {
         int size = 0;
-        Node currentNode = startNode;
+        Node<T> currentNode = startNode;
         while (currentNode!=null) {
             currentNode = currentNode.nextNode;
             size++;
@@ -21,11 +18,11 @@ public class CustomLinkedList extends RuntimeException{
         return size;
     }
 
-    public Node get(Integer index) {
+    public Node<T> get(Integer index) {
         if (index >= size()) {
-            throw new CustomLinkedList("Index " + index + " out of bounds for length of " + size(),true);
+            throw new IndexOutOfBoundsException(index);
         }
-        Node currentNode = startNode;
+        Node<T> currentNode = startNode;
         int k = 0;
         while (k != index && currentNode != null) {
             currentNode = currentNode.nextNode;
@@ -36,13 +33,13 @@ public class CustomLinkedList extends RuntimeException{
 
     public void delete(Integer index) {
         if (index >= size()) {
-            throw new CustomLinkedList("Index " + index + " out of bounds for length of " + size(),true);
+            throw new IndexOutOfBoundsException(index);
         }
         if (index == 0) {
             startNode = startNode.nextNode;
             return;
         }
-        Node currentNode = startNode;
+        Node<T> currentNode = startNode;
         int k = 0;
         while (k != index-1 && currentNode != null) {
             currentNode = currentNode.nextNode;
@@ -51,37 +48,37 @@ public class CustomLinkedList extends RuntimeException{
         currentNode.nextNode = currentNode.nextNode.nextNode;
     }
 
-    public void insert(Integer index, String data){
+    public void insert(Integer index, T data){
         if (index > size()) {
-            throw new CustomLinkedList("Index " + index + " out of bounds for length of " + size(),true);
+            throw new IndexOutOfBoundsException(index);
         }
         if (index == 0 && size() == 0) {
-            startNode = new Node(data);
+            startNode = new Node<T>(data);
             return;
         }
         if (index == 0) {
-            Node newNode = new Node(startNode.data,startNode.nextNode);
-            startNode = new Node(data, newNode);
+            Node<T> newNode = new Node<T>(startNode.data,startNode.nextNode);
+            startNode = new Node<T>(data, newNode);
             return;
         }
-        Node currentNode = startNode;
+        Node<T> currentNode = startNode;
         int k = 0;
         while (k != index-1 && currentNode != null) {
             currentNode = currentNode.nextNode;
             k++;
         }
         if (index == size()) {
-            Node newNode = new Node(data, null);
+            Node<T> newNode = new Node<T>(data, null);
             currentNode.nextNode = newNode;
         }
         else {
-            Node newNode = new Node(data, currentNode.nextNode);
+            Node<T> newNode = new Node<T>(data, currentNode.nextNode);
             currentNode.nextNode = newNode;
         }
         
     }
     public void printList() {
-        Node currentNode = startNode;
+        Node<T> currentNode = startNode;
         while(currentNode != null) {
             System.err.println(currentNode.data);
             currentNode = currentNode.nextNode;
