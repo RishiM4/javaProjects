@@ -39,6 +39,6 @@ public class StringCompression {
 
         System.out.println(encode(input));
         scanner.close();
-
+        decode(input);
     }
 }
