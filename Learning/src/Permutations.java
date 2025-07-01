@@ -41,11 +41,11 @@ public class Permutations {
             numOfPermutations *= k;
         }
         Long currentTime = System.currentTimeMillis();
-        //ArrayList<String> results = findPermutations(b);
+        ArrayList<String> results = findPermutations(b);
         
         System.out.println("Code took "+(System.currentTimeMillis()-currentTime)+"ms to find " + numOfPermutations + " unique permutations!");
         
-        
+        System.out.println(results);
         /*for(int k = 0; k < results.size(); k++) {
             for(int j = 0; j < s.length()-b.length()+1; j++) {
                 //System.out.println(s.substring(j, j+b.length()));

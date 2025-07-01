@@ -61,6 +61,7 @@ public class CustomStack<T> {
         }
     }
     public static void main(String[] args) {
-        
+        Stack<Integer> t = new Stack<>();
+        t.pop();
     }
 }
