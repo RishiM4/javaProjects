@@ -5,10 +5,10 @@ public class CustomStack<T> {
 
     private Node<T> startNode = new Node<T>(null, null);
     
-    public T push(T data) {
-        Node<T> temp = new Node<T>(data,startNode.nextNode);
+    public T push(T e) {
+        Node<T> temp = new Node<T>(e,startNode.nextNode);
         startNode.nextNode = temp;
-        return data;
+        return e;
     }
     public T pop() {
         if (startNode.nextNode == null) {

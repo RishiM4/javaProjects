@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "PermutationChecker",
+            "request": "launch",
+            "mainClass": "PermutationChecker",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "CustomQueue",
+            "request": "launch",
+            "mainClass": "CustomQueue",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "TowerOfHanoi",
             "request": "launch",
             "mainClass": "TowerOfHanoi",
