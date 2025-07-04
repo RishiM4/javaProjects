@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class PermutationChecker {
-    private static boolean check (String substring, final HashMap<Character,Integer> t) {
+    private static boolean check (String substring, HashMap<Character,Integer> t) {
         HashMap<Character,Integer> f = new HashMap<>();
         for(Character key : t.keySet()) {
             f.put(key,t.get(key));
@@ -28,8 +28,10 @@ public class PermutationChecker {
     }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        final String b = scanner.nextLine();
-        final String s = scanner.nextLine();
+        String b = scanner.nextLine();
+        String s = scanner.nextLine();
+        b=b.toLowerCase();
+        s=s.toLowerCase();
         HashMap<Character,Integer> t = new HashMap<Character,Integer>();
         for(int k = 0; k < s.length(); k++) {
             if (t.containsKey(s.charAt(k))) {
@@ -39,14 +41,13 @@ public class PermutationChecker {
                 t.put(s.charAt(k),1);
             }
         }
-        System.err.println("");
-        System.err.println("");
-        System.err.println("");
-        System.err.println("");
-        System.err.println("");
+        System.err.println("\n");
+        System.err.println("\n");
+        System.err.println("\n");
+        System.err.println("\n");
+        System.err.println("\n");
         for(int k=0; k <= b.length()-s.length(); k++) {
             if(check(b.substring(k, k+s.length()), t)) {
-
                 System.out.println("Permutation '"+b.substring(k,k+s.length())+"' was found from index "+k+" to index "+(k+s.length()));
             }
         }
