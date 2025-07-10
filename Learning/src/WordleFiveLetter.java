@@ -53,7 +53,7 @@ public class WordleFiveLetter {
     static final String ANSI_YELLOW = "\u001B[33m";
     static final String ANSI_GREEN = "\u001B[32m";
     static final String ANSI_GRAY = "\u001B[90m";
-    static String[] storedGuesses = {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",};
+    static String[] storedGuesses = new String[99];
     static int guessNumber = 0;
     static int mode = 1;
     static int numOfGuesses;
@@ -79,8 +79,8 @@ public class WordleFiveLetter {
     static JLabel O= new JLabel("O");
     static JLabel P= new JLabel("P");
     static JLabel Q= new JLabel("Q");
-    static JLabel R= new JLabel("R");//COOLEST LETTER IN THE WORLD
-    static JLabel S= new JLabel("S");//not so cool letter if your name starts with it
+    static JLabel R= new JLabel("R");
+    static JLabel S= new JLabel("S");
     static JLabel T= new JLabel("T");
     static JLabel U= new JLabel("U");
     static JLabel V= new JLabel("V");
@@ -138,7 +138,11 @@ public class WordleFiveLetter {
     static HashMap<Integer, Rectangle> boxPositions = new HashMap<Integer, Rectangle>();
     static JPanel displayPanel = new JPanel();
     static final Long startTime = System.currentTimeMillis();
-
+    private static void initializeStoredGuesess() {
+        for(int k = 0; k < storedGuesses.length; k++) {
+            storedGuesses[k] = "";
+        }
+    }
     private static void setFont() {
         Font customFont = new Font("Arial",Font.BOLD, 30);
         enter.setFont(customFont);
@@ -597,12 +601,8 @@ public class WordleFiveLetter {
 
                 if (((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0)) {
                     if ((e.getKeyCode() == KeyEvent.VK_W)) {
-                        Random random = new Random();
                     
-                        try {
-                            Thread.sleep(random.nextInt(100,250));
-                        } catch (InterruptedException f) {
-                        }
+                        
                         System.exit(0);
                     }
                     else if((e.getKeyCode() == KeyEvent.VK_R)){
@@ -2355,7 +2355,7 @@ public class WordleFiveLetter {
             System.err.println("You have won!");
             System.err.println("Thanks for playing!");
             System.err.println("");
-            String message = "Congratulations, you have won!\nYou completed this wordle in "+(System.currentTimeMillis()-startTime)+"ms\nThanks for Playing!";
+            String message = "Congratulations, you have won!\nYou completed this wordle in "+(System.currentTimeMillis()-startTime)/1000+" seconds\nThanks for Playing!";
             JOptionPane.showMessageDialog(frame, message); 
             
             
@@ -2388,7 +2388,7 @@ public class WordleFiveLetter {
     }
     
     public static void main(String[] args) throws Exception {
-        
+        initializeStoredGuesess();
         initLists();
         keyBoardActionListener();
         updateAnswerDisplay();
