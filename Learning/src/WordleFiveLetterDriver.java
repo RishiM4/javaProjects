@@ -4,12 +4,12 @@ public class WordleFiveLetterDriver {
     public void start() {
         Thread t = new Thread(() -> {
             while(true) {
-            System.out.println(wordle.getRestart());
-            if (wordle.getRestart() == true) {
-                wordle = new WordleFiveLetter();
-                wordle.start();
+                System.out.println(wordle.getRestart());
+                if (wordle.getRestart() == true) {
+                    wordle = new WordleFiveLetter();
+                    wordle.start();
+                }
             }
-        }
         });
         wordle.start();
         t.start();
