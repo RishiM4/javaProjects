@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "WordleFiveLetterDriver",
+            "request": "launch",
+            "mainClass": "WordleFiveLetterDriver",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "Car",
             "request": "launch",
             "mainClass": "car.Car",

@@ -48,102 +48,105 @@ import java.util.List;
 import java.util.Random;
 
 public class WordleFiveLetter {
-    static boolean usingKeyboard = false;
-    static final String ANSI_RESET = "\u001B[0m";
-    static final String ANSI_YELLOW = "\u001B[33m";
-    static final String ANSI_GREEN = "\u001B[32m";
-    static final String ANSI_GRAY = "\u001B[90m";
-    static String[] storedGuesses = new String[99];
-    static int guessNumber = 0;
-    static int mode = 1;
-    static int numOfGuesses;
-    static boolean keepFirstGuess = true;
-    static boolean quickFix  = false;
-    static Printer printer = new Printer();
-    static boolean keyboardPrinted = true;
-    static int temp = 0;
-    static JLabel A= new JLabel("A");
-    static JLabel B= new JLabel("B");
-    static JLabel C= new JLabel("C");
-    static JLabel D= new JLabel("D");
-    static JLabel E= new JLabel("E");
-    static JLabel F= new JLabel("F");
-    static JLabel G= new JLabel("G");
-    static JLabel H= new JLabel("H");
-    static JLabel I= new JLabel("I");
-    static JLabel J= new JLabel("J");
-    static JLabel K= new JLabel("K");
-    static JLabel L= new JLabel("L");
-    static JLabel M= new JLabel("M");
-    static JLabel N= new JLabel("N");
-    static JLabel O= new JLabel("O");
-    static JLabel P= new JLabel("P");
-    static JLabel Q= new JLabel("Q");
-    static JLabel R= new JLabel("R");
-    static JLabel S= new JLabel("S");
-    static JLabel T= new JLabel("T");
-    static JLabel U= new JLabel("U");
-    static JLabel V= new JLabel("V");
-    static JLabel W= new JLabel("W");
-    static JLabel X= new JLabel("X");
-    static JLabel Y= new JLabel("Y");
-    static JLabel Z= new JLabel("Z");
-    static JLabel downArrow = new JLabel("↓");
-    static JLabel upArrow = new JLabel("↑");
-    static JLabel enter = new JLabel("Enter");
-    static ImageIcon originalBackspaceIcon = new ImageIcon("deleteIcon.png");
-    static Image imageBackspaceIcon = originalBackspaceIcon.getImage();
-    static ImageIcon backspaceIcon = new ImageIcon(imageBackspaceIcon.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
-    static JLabel backspace = new JLabel(backspaceIcon);
-    static JFrame frame = new JFrame("Wordle - By Rishi Mohan");
-    static JPanel panel = new JPanel();
-    static JTextField textField = new JTextField(20);
-    static JPopupMenu popupMenu = new JPopupMenu();
-    static JCheckBoxMenuItem menuItemHideKeyboard = new JCheckBoxMenuItem("Hide Keyboard");
-    static JMenuItem menuItemGiveUp = new JMenuItem("Give Up");
-    static JMenuItem menuItemRefresh = new JMenuItem("Refresh");
-    static JMenuItem menuItemClose = new JMenuItem("Close");
-    static JMenuItem menuItemHint = new JMenuItem("Hint");
-    static JMenuBar menuBar = new JMenuBar();
-    static JMenu accountMenu = new JMenu("Account");
-    static JMenu editMenu = new JMenu("Edit");
-    static JMenu wordHelper = new JMenu("Word Helper");
-    static JMenuItem wordUnscramble = new JMenuItem("Unscramble Word");
-    static JMenuItem wordContains = new JMenuItem("Word Contains");
-    static JMenuItem wordStartsWith = new JMenuItem("Word Starts With");
-    static JMenuItem cutItem = new JMenuItem("Cut");
-    static JMenuItem copyItem = new JMenuItem("Copy");
-    static JMenuItem pasteItem = new JMenuItem("Paste");
-    static JMenuItem loginItem = new JMenuItem("Login");
-    static JMenuItem createAccountItem = new JMenuItem("Create Account");
-    static JMenuItem averageGuessesItem = new JMenuItem("Average Guesses");
-    static JMenuItem logoutMenuItem = new JMenuItem("Logout");
-    static UndoManager undoManager = new UndoManager();
-    static Boolean keyboardDisplayed = false;
-    static JButton button = new JButton("Hint");
-    static HashMap<Character, Integer> letterIndex = new HashMap<Character, Integer>();
-    static String current  ="";
-    static String currentGuess = "";  
-    static String answer;
-    static boolean control = false;
-    static boolean accountLoggedIn = false;
-    static String currentUser = "";
-    static boolean highScoreBeaten = false;
-    static int j;
-    static ArrayList<String> guessIndex = new ArrayList<String>();
-    static ArrayList<String> answerIndex = new ArrayList<String>();
-    static ArrayList<String> trueGuessIndex = new ArrayList<String>();
-    static ArrayList<String> trueAnswerIndex = new ArrayList<String>();
-    static int displayNumber = 1;
-    static HashMap<Integer, Rectangle> boxPositions = new HashMap<Integer, Rectangle>();
-    static JPanel displayPanel = new JPanel();
-    static final Long startTime = System.currentTimeMillis();
-    private static void initializeStoredGuesess() {
+    private boolean usingKeyboard = false;
+    private final String ANSI_RESET = "\u001B[0m";
+    private final String ANSI_YELLOW = "\u001B[33m";
+    private final String ANSI_GREEN = "\u001B[32m";
+    private final String ANSI_GRAY = "\u001B[90m";
+    private String[] storedGuesses = new String[99];
+    private int guessNumber = 0;
+    private int mode = 1;
+    private int numOfGuesses;
+    private boolean keepFirstGuess = true;
+    private boolean quickFix  = false;
+    private Printer printer = new Printer();
+    private boolean keyboardPrinted = true;
+    private int temp = 0;
+    private JLabel A= new JLabel("A");
+    private JLabel B= new JLabel("B");
+    private JLabel C= new JLabel("C");
+    private JLabel D= new JLabel("D");
+    private JLabel E= new JLabel("E");
+    private JLabel F= new JLabel("F");
+    private JLabel G= new JLabel("G");
+    private JLabel H= new JLabel("H");
+    private JLabel I= new JLabel("I");
+    private JLabel J= new JLabel("J");
+    private JLabel K= new JLabel("K");
+    private JLabel L= new JLabel("L");
+    private JLabel M= new JLabel("M");
+    private JLabel N= new JLabel("N");
+    private JLabel O= new JLabel("O");
+    private JLabel P= new JLabel("P");
+    private JLabel Q= new JLabel("Q");
+    private JLabel R= new JLabel("R");
+    private JLabel S= new JLabel("S");
+    private JLabel T= new JLabel("T");
+    private JLabel U= new JLabel("U");
+    private JLabel V= new JLabel("V");
+    private JLabel W= new JLabel("W");
+    private JLabel X= new JLabel("X");
+    private JLabel Y= new JLabel("Y");
+    private JLabel Z= new JLabel("Z");
+    private JLabel downArrow = new JLabel("↓");
+    private JLabel upArrow = new JLabel("↑");
+    private JLabel enter = new JLabel("Enter");
+    private ImageIcon originalBackspaceIcon = new ImageIcon("deleteIcon.png");
+    private Image imageBackspaceIcon = originalBackspaceIcon.getImage();
+    private ImageIcon backspaceIcon = new ImageIcon(imageBackspaceIcon.getScaledInstance(30, 30, Image.SCALE_DEFAULT));
+    private JLabel backspace = new JLabel(backspaceIcon);
+    private JFrame frame = new JFrame("Wordle - By Rishi Mohan");
+    private JPanel panel = new JPanel();
+    private JTextField textField = new JTextField(20);
+    private JPopupMenu popupMenu = new JPopupMenu();
+    private JCheckBoxMenuItem menuItemHideKeyboard = new JCheckBoxMenuItem("Hide Keyboard");
+    private JMenuItem menuItemGiveUp = new JMenuItem("Give Up");
+    private JMenuItem menuItemRestart = new JMenuItem("Restart");
+    private JMenuItem menuItemRefresh = new JMenuItem("Refresh");
+    private JMenuItem menuItemClose = new JMenuItem("Close");
+    private JMenuItem menuItemHint = new JMenuItem("Hint");
+    private JMenuBar menuBar = new JMenuBar();
+    private JMenu accountMenu = new JMenu("Account");
+    private JMenu editMenu = new JMenu("Edit");
+    private JMenu wordHelper = new JMenu("Word Helper");
+    private JMenuItem wordUnscramble = new JMenuItem("Unscramble Word");
+    private JMenuItem wordContains = new JMenuItem("Word Contains");
+    private JMenuItem wordStartsWith = new JMenuItem("Word Starts With");
+    private JMenuItem cutItem = new JMenuItem("Cut");
+    private JMenuItem copyItem = new JMenuItem("Copy");
+    private JMenuItem pasteItem = new JMenuItem("Paste");
+    private JMenuItem loginItem = new JMenuItem("Login");
+    private JMenuItem createAccountItem = new JMenuItem("Create Account");
+    private JMenuItem averageGuessesItem = new JMenuItem("Average Guesses");
+    private JMenuItem logoutMenuItem = new JMenuItem("Logout");
+    private UndoManager undoManager = new UndoManager();
+    private Boolean keyboardDisplayed = false;
+    private JButton button = new JButton("Hint");
+    private HashMap<Character, Integer> letterIndex = new HashMap<Character, Integer>();
+    private String current  ="";
+    private String currentGuess = "";  
+    private String answer;
+    private boolean control = false;
+    private boolean accountLoggedIn = false;
+    private String currentUser = "";
+    private boolean highScoreBeaten = false;
+    private int j;
+    private ArrayList<String> guessIndex = new ArrayList<String>();
+    private ArrayList<String> answerIndex = new ArrayList<String>();
+    private ArrayList<String> trueGuessIndex = new ArrayList<String>();
+    private ArrayList<String> trueAnswerIndex = new ArrayList<String>();
+    private int displayNumber = 1;
+    private HashMap<Integer, Rectangle> boxPositions = new HashMap<Integer, Rectangle>();
+    private JPanel displayPanel = new JPanel();
+    public boolean restart = false;
+    private final Long startTime = System.currentTimeMillis();
+
+    private void initializeStoredGuesess() {
         for(int k = 0; k < storedGuesses.length; k++) {
             storedGuesses[k] = "";
         }
     }
-    private static void setFont() {
+    private void setFont() {
         Font customFont = new Font("Arial",Font.BOLD, 30);
         enter.setFont(customFont);
         A.setFont(customFont);
@@ -176,7 +179,7 @@ public class WordleFiveLetter {
         upArrow.setFont(customFont);
         enter.setFont(new Font("Arial", Font.PLAIN, 15));
     }
-    private static JLabel changeColor(HashMap<Character,Integer> colored, JLabel letter, Character character) {
+    private JLabel changeColor(HashMap<Character,Integer> colored, JLabel letter, Character character) {
         
         if (colored.get(character).equals(0)) {
             letter.setForeground(Color.WHITE);
@@ -193,7 +196,7 @@ public class WordleFiveLetter {
         return letter;
         
     }
-    private static void setColor() {
+    private void setColor() {
         enter.setForeground(Color.WHITE);
         A = changeColor(letterIndex, A, 'A');
         B = changeColor(letterIndex, B, 'B');
@@ -224,7 +227,7 @@ public class WordleFiveLetter {
 
 
     }
-    private static void setPosition() {
+    private void setPosition() {
         int originX = 15;
         int originY = 325;
         Q.setBounds(5+originX,10+originY,25,25);
@@ -261,7 +264,7 @@ public class WordleFiveLetter {
         downArrow.setBounds(300,200,40,40);
         upArrow.setBounds(300, 150, 40, 40);
     }
-    private static void add() {
+    private void add() {
         
         panel.setVisible(false);
         panel.setVisible(true);
@@ -296,7 +299,7 @@ public class WordleFiveLetter {
         frame.add(downArrow);
         frame.add(upArrow);
     }
-    private static void condenseResults(){
+    private void condenseResults(){
         HashMap<Character, String> results = new HashMap<Character, String>();
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String guess = prepareWord(currentGuess, true);
@@ -340,7 +343,7 @@ public class WordleFiveLetter {
         }
         
     }
-    private static void initLists() {
+    private void initLists() {
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         letterIndex.put('#', 0);
         for (int k = 0; k < 26; k++) {
@@ -358,7 +361,7 @@ public class WordleFiveLetter {
         }
         return;
     }
-    private static void generateBoxPositions(int originX, int originY){
+    private void generateBoxPositions(int originX, int originY){
         Path filePath = Paths.get("wordlePositionData.txt");
         for(int k =0; k < 30; k++){
             try {
@@ -375,7 +378,7 @@ public class WordleFiveLetter {
         }
  
     }
-    private static JPanel setBoxColor(JPanel tempPanel, int panelNumber){
+    private JPanel setBoxColor(JPanel tempPanel, int panelNumber){
         try {
             int turnNumber = 0;
             for(;panelNumber >= 5;){
@@ -397,7 +400,7 @@ public class WordleFiveLetter {
         
         return tempPanel;
     }
-    private static JLabel setBoxLetter(JLabel label, int panelNumber){
+    private JLabel setBoxLetter(JLabel label, int panelNumber){
         
         try {
             int turnNumber = 0;
@@ -413,7 +416,7 @@ public class WordleFiveLetter {
         
         return label;
     }
-    private static void updateAnswerDisplay(){
+    private void updateAnswerDisplay(){
         frame.remove(displayPanel);
         displayPanel = new JPanel();
         for(int k =0; k <30; k++){
@@ -450,7 +453,7 @@ public class WordleFiveLetter {
         displayPanel.setBounds(15,10,260,310);
         displayPanel.setVisible(true);
     }
-    private static void updateWindow() {
+    private void updateWindow() {
         if (!textField.hasFocus()) {
                
         }
@@ -507,6 +510,7 @@ public class WordleFiveLetter {
         popupMenu.setBorderPainted(false);
         popupMenu.add(menuItemGiveUp);
         popupMenu.add(menuItemRefresh);
+        popupMenu.add(menuItemRestart);
         popupMenu.add(menuItemClose);
         popupMenu.add(menuItemHint);
         popupMenu.add(menuItemHideKeyboard);
@@ -516,6 +520,7 @@ public class WordleFiveLetter {
         menuItemGiveUp.setBackground(Color.WHITE);
         menuItemHideKeyboard.setBackground(Color.WHITE);
         menuItemRefresh.setBackground(Color.WHITE);
+        menuItemRestart.setBackground(Color.WHITE);
         menuItemHint.setBackground(Color.WHITE);
 
         menuItemHint.setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
@@ -523,6 +528,7 @@ public class WordleFiveLetter {
         menuItemGiveUp.setBorder(new MatteBorder(0, 0, 1, 0, Color.BLACK));
         menuItemHideKeyboard.setBorder(new MatteBorder(1, 0, 0, 0, Color.BLACK));
         menuItemRefresh.setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
+        menuItemRestart.setBorder(new MatteBorder(0,0,0,0,Color.black));
         
         Border whiteBorder = BorderFactory.createLineBorder(Color.WHITE, 1);
         Border blackBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
@@ -561,7 +567,7 @@ public class WordleFiveLetter {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
     }  
-    private static void addFrameListener(){
+    private void addFrameListener(){
         frame.addKeyListener(new KeyListener() {
             String output = "";
             @Override
@@ -583,7 +589,7 @@ public class WordleFiveLetter {
             
         });
     } 
-    private static void addActionListener(){
+    private void addActionListener(){
         undoRedoActionListener();
         editMenuActionListener();
         accountMenuActionListener();
@@ -681,6 +687,16 @@ public class WordleFiveLetter {
             public void actionPerformed(ActionEvent e) {
                 updateKeyboard();
             }
+        });
+        menuItemRestart.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("hi");
+                frame.setVisible(false);
+                restart = true;
+            }
+            
         });
         menuItemHint.addActionListener(new ActionListener() {
             @Override
@@ -801,7 +817,7 @@ public class WordleFiveLetter {
             }
         });
     }
-    private static void wordHelperActionListener(){
+    private void wordHelperActionListener(){
         wordUnscramble.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent g) {
@@ -908,7 +924,7 @@ public class WordleFiveLetter {
             
         });
     }
-    private static ArrayList<String> checkWordContains(String input){
+    private ArrayList<String> checkWordContains(String input){
         ArrayList<String> output = new ArrayList<String>();
         Boolean matches  = false;
         try {
@@ -934,7 +950,7 @@ public class WordleFiveLetter {
         }
         return output;
     }
-    private static ArrayList<String> unscrambleWord(String input){
+    private ArrayList<String> unscrambleWord(String input){
         ArrayList<String> output = new ArrayList<String>();
         Path filePath = Paths.get("wordleAnswerData.txt");
         try {
@@ -956,7 +972,7 @@ public class WordleFiveLetter {
         }
         return output;
     }
-    private static ArrayList<String> checkWordStartsWith(String input){
+    private ArrayList<String> checkWordStartsWith(String input){
         ArrayList<String> output = new ArrayList<String>();
         Path filePath = Paths.get("words.txt");
         boolean control = true;
@@ -985,14 +1001,14 @@ public class WordleFiveLetter {
         }
         return output;
     }
-    private static String sortWord(String input) {
+    private String sortWord(String input) {
         input = input.toLowerCase();
         input = input.replaceAll(" ", "");
         char[] temp = input.toCharArray();
         Arrays.sort(temp);
         return new String(temp);
     }
-    private static void keyBoardActionListener(){
+    private void keyBoardActionListener(){
         A.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -1446,7 +1462,7 @@ public class WordleFiveLetter {
             public void mouseExited(MouseEvent e) {}
         });
     }
-    private static void accountMenuActionListener(){
+    private void accountMenuActionListener(){
         loginItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1573,7 +1589,7 @@ public class WordleFiveLetter {
 
         
     }
-    private static void disableAccountMenu(){
+    private void disableAccountMenu(){
         if (accountLoggedIn) {
             loginItem.setEnabled(false);
             logoutMenuItem.setEnabled(true);
@@ -1586,7 +1602,7 @@ public class WordleFiveLetter {
 
         }
     }
-    private static void createUser(String username){
+    private void createUser(String username){
         Path filePath = Paths.get("wordleUserData.txt");
         try {
 			List<String> lines = Files.readAllLines(filePath);
@@ -1602,7 +1618,7 @@ public class WordleFiveLetter {
 		}
         return;
     }
-    private static void updateStatistics(boolean win){
+    private void updateStatistics(boolean win){
         if (!accountLoggedIn) {
             return;
         }
@@ -1625,7 +1641,7 @@ public class WordleFiveLetter {
 			e.printStackTrace();
 		}
     }
-    private static double getAverageGuesses() {
+    private double getAverageGuesses() {
         Path filePath = Paths.get("wordleUserData.txt");
         try {
 			List<String> lines = Files.readAllLines(filePath);
@@ -1649,7 +1665,7 @@ public class WordleFiveLetter {
         System.out.println("ERROR: NO DATA FOUND");
         return 0;
     }
-    private static String encrypt(String strToEncrypt, SecretKey secretKey) {
+    private String encrypt(String strToEncrypt, SecretKey secretKey) {
         try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -1661,12 +1677,12 @@ public class WordleFiveLetter {
         return "";
         
     }
-    private static SecretKey generateKey(int n) throws Exception {
+    private SecretKey generateKey(int n) throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(n);
         return keyGenerator.generateKey();
     }
-    private static String decryptText(String strToDecrypt) {
+    private String decryptText(String strToDecrypt) {
         try {
             byte[] secretKeyBytes = Base64.getDecoder().decode(Files.readAllBytes(Paths.get("secretKey.txt")));
             SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
@@ -1678,7 +1694,7 @@ public class WordleFiveLetter {
         }
         return "";
     }
-    private static void editMenuActionListener(){
+    private void editMenuActionListener(){
         cutItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1701,7 +1717,7 @@ public class WordleFiveLetter {
             }
         });
     }
-    private static void undoRedoActionListener(){
+    private void undoRedoActionListener(){
         
         textField.getDocument().addUndoableEditListener(new UndoableEditListener() {
             public void undoableEditHappened(UndoableEditEvent e) {
@@ -1739,7 +1755,7 @@ public class WordleFiveLetter {
         textField.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "Redo");
         textField.getActionMap().put("Redo", redoAction);
     }
-    private static void createHint(int giveHint){
+    private void createHint(int giveHint){
         mode = 3;
         if (giveHint == 0) {
             Random random = new Random();
@@ -1774,7 +1790,7 @@ public class WordleFiveLetter {
             return;
         }
     }  
-    private static void getVowels() {
+    private void getVowels() {
         int numOfVowels = 0;
         for (int k = 0;k<=4; k++) {
             Character currentChar = answer.charAt(k);
@@ -1806,7 +1822,7 @@ public class WordleFiveLetter {
         System.out.println("The answer contians "+numOfVowels+" vowels!");
         return;
     } 
-    private static void similarWord(){
+    private void similarWord(){
          
         StringBuffer tempAnswer = new StringBuffer(answer);
         try {
@@ -1858,7 +1874,7 @@ public class WordleFiveLetter {
         }
         return;
     }
-    private static void revealYellow() {
+    private void revealYellow() {
         ArrayList<Character> possibleAnswers = new ArrayList<Character>();
         Random random = new Random();
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1882,7 +1898,7 @@ public class WordleFiveLetter {
         
         
     }
-    private static void updateKeyboard() {
+    private void updateKeyboard() {
         if (temp == 0) {
             
             condenseResults();
@@ -1898,12 +1914,12 @@ public class WordleFiveLetter {
         }
         
     }
-    private static void printSpaces() {
+    private void printSpaces() {
         for(int k = 0; k < 32; k++){
             System.err.println();
         }
     }
-    private static void updateHighscore(int guesses, boolean win) {
+    private void updateHighscore(int guesses, boolean win) {
         if (mode == 1&&win) {
             try {
             
@@ -1953,7 +1969,7 @@ public class WordleFiveLetter {
         }
         
     }
-    private static int getNumOfGuesses(Scanner scanner) {
+    private int getNumOfGuesses(Scanner scanner) {
         Object[] options = {4, 6,8,"Custom"};
         int choice = -1;
         while (choice == -1) {
@@ -1994,7 +2010,7 @@ public class WordleFiveLetter {
         return 6;
             
     }   
-    private static Boolean wordType(Scanner scanner) {
+    private Boolean wordType(Scanner scanner) {
         
         Object[] options = {"Random", "Custom"};
         int choice = -1;
@@ -2018,7 +2034,7 @@ public class WordleFiveLetter {
         }
         return true;
     }
-    private static void chooseWord(Scanner scanner) {
+    private void chooseWord(Scanner scanner) {
         System.out.println("Would you like to choose your word, or have a random word generated?");
         System.out.println("Please type 'Random' for a random word and 'Custom' for a custom word!");
         boolean generateAnswer = wordType(scanner);
@@ -2046,7 +2062,7 @@ public class WordleFiveLetter {
         
         
     }
-    private static String prepareWord(String input, boolean trimWord) {
+    private String prepareWord(String input, boolean trimWord) {
         String output = input;
         output = output.replaceAll("[^a-zA-Z]","");
         output = output.replaceAll(" ", "");
@@ -2063,7 +2079,7 @@ public class WordleFiveLetter {
         return output;
 
     }
-    private static Boolean checkForGreen(String input, int index) {
+    private Boolean checkForGreen(String input, int index) {
         try {
             if (input.charAt(index) == answer.charAt(index)) {
                 return true;
@@ -2073,7 +2089,7 @@ public class WordleFiveLetter {
         }
         return false;
     }
-    private static Boolean checkForYellow(String input,  int index) {
+    private Boolean checkForYellow(String input,  int index) {
         
         try {
             String temp = "" + input.charAt(index);
@@ -2088,7 +2104,7 @@ public class WordleFiveLetter {
         
         return false;
     }
-    private static String convertToWord (String result, String input) {
+    private String convertToWord (String result, String input) {
         String output = "";
 
         for(int k = 0; k < 5; k++) {
@@ -2104,7 +2120,7 @@ public class WordleFiveLetter {
         }
         return output;
     }
-    private static void printGuesses(String guess, Boolean updateGuesses) {
+    private void printGuesses(String guess, Boolean updateGuesses) {
         //print guesses method is being called multiple times.
         
         
@@ -2145,7 +2161,7 @@ public class WordleFiveLetter {
         
         
     }
-    private static int getChars(Character character, String input){
+    private int getChars(Character character, String input){
         int count = 0;
 
         for(int k = 0; k < input.length(); k++){
@@ -2155,7 +2171,7 @@ public class WordleFiveLetter {
         }
         return count;
     }
-    private static String removeChars(int count,String newCompiledAnswer,String compiledAnswer) {
+    private String removeChars(int count,String newCompiledAnswer,String compiledAnswer) {
         //2
         //##GYY
         //GGGYY
@@ -2182,7 +2198,7 @@ public class WordleFiveLetter {
         //System.out.println(output);
         return output.toString();
     }
-	private static String checkForDupe(String input, String answer, int index, String compiledAnswer){
+	private String checkForDupe(String input, String answer, int index, String compiledAnswer){
         char character = answer.charAt(index-1);
         int numberOfChars = getChars(character, input);
         StringBuffer newCompiledAnswer = new StringBuffer(compiledAnswer);
@@ -2217,7 +2233,7 @@ public class WordleFiveLetter {
 
         return compiledAnswer;
     }
-    private static String compile(String input) {
+    private String compile(String input) {
         StringBuffer output = new StringBuffer("XXXXX");
         for(int p = 0; p < 5; p++) {
             if(checkForYellow(input, p)) {
@@ -2232,14 +2248,14 @@ public class WordleFiveLetter {
         }
         return output.toString();
     }
-    private static String initDupes(String input) {
+    private String initDupes(String input) {
         String output=compile(input);
         for (int k = 1; k<=5; k++){
             output = checkForDupe(input, answer,k,output);
         }
         return output;
     }
-    private static boolean checkIfRealWord(String input){
+    private boolean checkIfRealWord(String input){
         Path filePath = Paths.get("wordleInputData.txt");
         input = prepareWord(input, true);
         try {
@@ -2254,7 +2270,7 @@ public class WordleFiveLetter {
             return false;
         }
     } 
-    private static void scrollDown(){
+    private void scrollDown(){
         if (displayNumber<j-4){
             displayNumber++;
             guessIndex.set(0, trueGuessIndex.get(displayNumber-1));
@@ -2279,7 +2295,7 @@ public class WordleFiveLetter {
         updateAnswerDisplay();
         updateKeyboard();
     }
-    private static void scrollUp(){
+    private void scrollUp(){
         if (displayNumber>1){
 
             displayNumber = displayNumber -1;
@@ -2304,14 +2320,14 @@ public class WordleFiveLetter {
         updateAnswerDisplay();
         updateKeyboard();
     }
-    private static void updateLists(String input, String compiledResults){
+    private void updateLists(String input, String compiledResults){
         answerIndex.set(j, input);
         guessIndex.set(j, compiledResults);
         trueAnswerIndex.set(j, input);
         trueGuessIndex.set(j, compiledResults);
         scrollDown();        
     }
-    private static void compileResults(String input, int guesses, Scanner scanner) {
+    private void compileResults(String input, int guesses, Scanner scanner) {
         if (j>=numOfGuesses-1) {
             endProgram(scanner, false);
         }
@@ -2349,7 +2365,7 @@ public class WordleFiveLetter {
         
         return;
     }
-    private static void endProgram(Scanner scanner, boolean win) {
+    private void endProgram(Scanner scanner, boolean win) {
         if (win) {
             System.err.println("Congratulations!");
             System.err.println("You have won!");
@@ -2386,8 +2402,10 @@ public class WordleFiveLetter {
         System.exit(0);
         
     }
-    
-    public static void main(String[] args) throws Exception {
+    public void stop(){
+        System.exit(0);
+    }
+    public void start() {
         initializeStoredGuesess();
         initLists();
         keyBoardActionListener();
@@ -2450,8 +2468,18 @@ public class WordleFiveLetter {
         endProgram(scanner, false);
         scanner.close();
        
-        
+     
     }
+    public WordleFiveLetter () {
+
+    }
+    public boolean getRestart() {
+        return this.restart;
+    }
+    public static void main(String[] args) {
+        new WordleFiveLetterDriver().start();
+    }
+   
 }
 
 //word starts with, word ends with, word exact contains
