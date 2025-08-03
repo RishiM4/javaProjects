@@ -692,7 +692,6 @@ public class WordleFiveLetter {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("hi");
                 frame.setVisible(false);
                 restart = true;
             }
