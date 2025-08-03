@@ -92,7 +92,10 @@ public class FuelTank implements Serializable{
     }
 
     
-    
+    /**
+     * 
+     * @return
+     */
     public FuelType getFuelType() {
         return fuelType;
     }
