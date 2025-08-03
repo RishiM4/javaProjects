@@ -6,6 +6,83 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Car",
+            "request": "launch",
+            "mainClass": "car.Car",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "GaGScript",
+            "request": "launch",
+            "mainClass": "GaGScript",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "GaGScript",
+            "request": "launch",
+            "mainClass": "com.rishimohan.GaGScript",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Backups",
+            "request": "launch",
+            "mainClass": "Backups",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "FuelTank",
+            "request": "launch",
+            "mainClass": "car.parts.FuelTank",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "SimpleChatServer",
+            "request": "launch",
+            "mainClass": "SimpleChatServer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "SimpleChatClient",
+            "request": "launch",
+            "mainClass": "SimpleChatClient",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "car.App",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Car",
+            "request": "launch",
+            "mainClass": "Car.Car",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "WordleFiveLetterTest",
+            "request": "launch",
+            "mainClass": "WordleFiveLetterTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "Car.App",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "PermutationChecker",
             "request": "launch",
             "mainClass": "PermutationChecker",
