@@ -35,6 +35,9 @@ import javax.swing.undo.UndoManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import static java.lang.Thread.ofVirtual;
+
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -349,7 +352,7 @@ public class WordleFiveLetter {
         for (int k = 0; k < 26; k++) {
             letterIndex.put(alphabet.charAt(k), 0);
         }
-        for(int k = 0; k < 99; k++){
+        for(int k = 0; k < 30; k++){
             boxPositions.put(k, null);
 
         }

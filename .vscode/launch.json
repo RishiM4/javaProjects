@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "BinaryConverter",
+            "request": "launch",
+            "mainClass": "BinaryConverter",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "WordleFiveLetterDriver",
             "request": "launch",
             "mainClass": "WordleFiveLetterDriver",
