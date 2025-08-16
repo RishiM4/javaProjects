@@ -1,7 +1,16 @@
 import java.util.Scanner;
 
 public class BinaryConverter {
-    private static void solve(Bit[] results, int input, int depth) {
+    public Bit[] solve(int input) {
+        Bit results[] = new Bit[(int) (Math.log(input) / Math.log(2))+1];
+        solve(results, input, 0);
+        Bit reversedResults[] = new Bit[results.length];
+        for(int i = results.length-1; i >= 0; i--) {
+            reversedResults[results.length-i-1] = results[i];
+        }
+        return reversedResults;
+    }
+    private void solve(Bit[] results, int input, int depth) {
         if (input == 1) {
             results[depth] = new Bit(1);
             return;
@@ -21,10 +30,9 @@ public class BinaryConverter {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Please provide a number to be converted into binary");
             int input = 39;
-            Bit results[] = new Bit[(int) (Math.log(input) / Math.log(2))+1];
-            solve(results, input, 0);
-            for(int i = results.length-1; i >= 0; i--) {
-                System.out.print(results[i]);
+            Bit t[] = new BinaryConverter().solve(input);
+            for (int i = 0; i < t.length; i++) {
+                System.err.print(t[i]);
             }
             scanner.close();
             
