@@ -2895,7 +2895,7 @@ poise
 poker
 24
 polar
-24
+2
 polka
 24
 polyp

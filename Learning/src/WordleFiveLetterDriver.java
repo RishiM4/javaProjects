@@ -4,15 +4,16 @@ public class WordleFiveLetterDriver {
     public void start() {
         Thread t = new Thread(() -> {
             while(true) {
-                System.out.println(wordle.getRestart());
                 if (wordle.getRestart() == true) {
                     wordle = new WordleFiveLetter();
                     wordle.start();
+                
                 }
             }
         });
-        wordle.start();
         t.start();
+        wordle.start();
+        
     }
     public static void main(String[] args) {
         new WordleFiveLetterDriver().start();

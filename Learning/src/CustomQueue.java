@@ -1,9 +1,3 @@
-import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-
 public class CustomQueue<T>{
 
     int start;
@@ -29,9 +23,6 @@ public class CustomQueue<T>{
         }
     }
     public static void main(String[] args) {
-        Queue<Integer> a = new ArrayBlockingQueue<Integer>(1);
-        CustomQueue<Integer> b = new CustomQueue<>(1);
-        a.add(1);
        
         
     }
