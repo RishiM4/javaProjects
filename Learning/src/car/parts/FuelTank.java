@@ -94,18 +94,32 @@ public class FuelTank implements Serializable{
     
     /**
      * 
-     * @return
+     * @return The {@code FuelType} that the fuel tank holds.
      */
     public FuelType getFuelType() {
         return fuelType;
     }
-    
+    /**
+     * 
+     * @return The capacity of the fuel tank as a double variable.
+     */
     public double getCapacity() {
         return capacity;
     }
+    /**
+     * 
+     * @return The current fuel level of the fuel tank as a double variable.
+     */
     public double getCurrentFuelLevel() {
         return currentFuelLevel;
     }
+    /**
+     * Adds a specified amount of fuel to the fuel tank.
+     * @param fuel The amount of fuel you would like to add.
+     * @return The fuel level after all modifications
+     * @throws IllegalArgumentException If parameter {@code fuel} is less than zero
+     * @throws IllegalArgumentException If the fuel added to the current fuel level exceeds the maximum capacity.
+     */
     public double refuel(double fuel) {
         if (fuel < 0) {
             throw new IllegalArgumentException("Cannot add a negative amount of fuel");
@@ -114,10 +128,18 @@ public class FuelTank implements Serializable{
             currentFuelLevel += fuel;
         }
         else {
+            
             throw new IllegalArgumentException("Fuel level " + (currentFuelLevel+fuel) + " is out of bounds for capacity " + capacity);
         }
         return currentFuelLevel;
     }
+    /**
+     * Removes a specified amount of fuel from the fuel tank.
+     * @param fuel The amount of fuel you would like to remove.
+     * @return The fuel level after all modifications
+     * @throws IllegalArgumentException If parameter {@code fuel} is less than zero
+     * @throws IllegalArgumentException If the fuel subtracted from the current fuel level is less than zero.
+     */
     public double drain(double fuel) {
         if (fuel < 0) {
             throw new IllegalArgumentException("Cannot remove a negative amount of fuel");
@@ -126,7 +148,7 @@ public class FuelTank implements Serializable{
             currentFuelLevel -= fuel;
         }
         else {
-            throw new IllegalArgumentException("Fuel level " + (currentFuelLevel-fuel) + " is out of bounds for capacity " + capacity);
+            throw new IllegalArgumentException("Fuel level " + (currentFuelLevel-fuel) + " cannot be less than zero.");
         }
         return currentFuelLevel;
     }
@@ -136,10 +158,7 @@ public class FuelTank implements Serializable{
         FuelTank tt = new FuelTank();
         tt.getCapacity();
         
-        try {
-            tt.finalize();
-        } catch (Throwable e) {
-            // TODO: handle exception
-        }
+        
+    
     }
 }
