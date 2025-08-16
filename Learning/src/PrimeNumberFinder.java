@@ -18,22 +18,25 @@ public class PrimeNumberFinder {
     static ArrayList<Long> list = new ArrayList<Long>();
     static double startTime = 0;
     static Calendar calandar = Calendar.getInstance();
-    static boolean writeToFile = true;
+    static boolean writeToFile = false;
     private static Boolean checkIfPrime(double input){
-        Boolean isPrime = true;
         double max = Math.sqrt(input);
         int k = 0;
         while (list.get(k)<=max) {
-            k=k+1;
+            k++;
             double temp = input/list.get(k); 
-            if (Math.round(temp)-temp == 0) {
+            if ((int)(temp)==temp) {
                 return false;
             }
         }
         
-        return isPrime;
+        return true;
     }
     private static void updateFile(){
+        if (!writeToFile) {
+            
+            return;
+        }
         Path filePath = Paths.get("primeNumberData.txt");
         try {
 			List<String> lines = new ArrayList<String>();
@@ -79,7 +82,7 @@ public class PrimeNumberFinder {
                 System.exit(0);
             }
         };
-        timer.schedule(task, 600000);
+        timer.schedule(task, 1800000);
         calandar = Calendar.getInstance();
         startTime = calandar.getTimeInMillis();
         while (timerActive) {

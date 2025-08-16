@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "NumberConverter",
+            "request": "launch",
+            "mainClass": "NumberConverter",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "BinaryConverter",
             "request": "launch",
             "mainClass": "BinaryConverter",
