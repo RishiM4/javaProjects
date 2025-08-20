@@ -82,7 +82,7 @@ public class PrimeNumberFinder {
                 System.exit(0);
             }
         };
-        timer.schedule(task, 1800000);
+        timer.schedule(task, 30000);
         calandar = Calendar.getInstance();
         startTime = calandar.getTimeInMillis();
         while (timerActive) {

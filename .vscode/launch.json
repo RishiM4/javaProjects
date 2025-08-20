@@ -6,6 +6,41 @@
     "configurations": [
         {
             "type": "java",
+            "name": "BattleShipClient",
+            "request": "launch",
+            "mainClass": "battleship.BattleShipClient",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "BattleShipServer",
+            "request": "launch",
+            "mainClass": "battleship.BattleShipServer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "ShipSelector",
+            "request": "launch",
+            "mainClass": "battleship.ShipSelector",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Client",
+            "request": "launch",
+            "mainClass": "Client",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Server",
+            "request": "launch",
+            "mainClass": "Server",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "NumberConverter",
             "request": "launch",
             "mainClass": "NumberConverter",
