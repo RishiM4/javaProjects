@@ -1,0 +1,13 @@
+0000 - Client disconnecting
+0001 - Client handler requesting player name.
+0002 - Client sending player name.
+0003 - Client querying for other clients that are matchmaking.
+0004 - Client handler sending results of all other matchmaking players.
+0005 - Client sending game request to its handler.
+0006 - Opponent has disconnected.
+0007 - Client handler game request to other client.
+0008 - Client telling its handler its decision on the game request.
+0009 - Handler telling opponent that the request was accepted.
+0010 - Handler telling opponent that the request was declined.
+0011 - Client telling its handler that the request was accepted.
+0012 - Handler telling both clients to start the game.
