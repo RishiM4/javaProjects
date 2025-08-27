@@ -10,6 +10,7 @@ public class BattleShipClientHandler implements Runnable{
     private BattleShipServer server;
     private Socket socket;
     private boolean matchmaking = true;
+    private boolean shipSelectionFinished = false;
     private String playerName;
     private BattleShipClientHandler opponentHandler;
     public BufferedWriter opponentWriter;
@@ -38,6 +39,7 @@ public class BattleShipClientHandler implements Runnable{
                     server.removeHandler(this);
                     socket.close();
                 }
+                System.err.println(s);
                 return s;
             }
         } catch (Exception e) {
@@ -97,8 +99,14 @@ public class BattleShipClientHandler implements Runnable{
                 String otherHandlers = "";
                 for(int k = 0; k < handlers.size(); k++) {
                     if (handlers.get(k)!=this&&handlers.get(k).isMatchmaking()) {
+                        if (otherHandlers.equals("")) {
+                            otherHandlers += handlers.get(k).getPlayerName();
+                            
+                        }
+                        else{
+                            otherHandlers += ","+handlers.get(k).getPlayerName();
+                        }
                         numOfOpponents++;
-                        otherHandlers += handlers.get(k).getPlayerName();
                     }
                 }
                 write("0004"+regex+(numOfOpponents)+regex+otherHandlers);

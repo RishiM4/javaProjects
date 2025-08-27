@@ -1,52 +1,74 @@
 package battleship;
-import java.awt.*;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.border.MatteBorder;
 
 public class ShipSelector {
-    static String currentRotation = "UP";
-    static int currentSize = 5;
-    static boolean isFinished = false;
-    public Ship[] getShips(JFrame frame) {
+    public void createBorder(JButton button, int k) {
+        if (currentRotation.equals("UP")||currentRotation.equals("DOWN")) {
+            if (k==0) {
+                MatteBorder border = new MatteBorder(2, 3, 0, 3, Color.BLACK);
+                button.setBorder(border);
+                }
+                else if (k==currentSize-1) {
+                MatteBorder border = new MatteBorder(0, 3, 2, 3, Color.BLACK);
+                button.setBorder(border);
+                }
+                else {
+                MatteBorder border = new MatteBorder(0, 3, 0, 3, Color.BLACK);
+                button.setBorder(border);
+            }
+        }
+        else {
+            if (k==0) {
+                MatteBorder border = new MatteBorder(2, 3, 2, 0, Color.BLACK);
+                button.setBorder(border);
+                }
+                else if (k==currentSize-1) {
+                MatteBorder border = new MatteBorder(2, 0, 2, 3, Color.BLACK);
+                button.setBorder(border);
+                }
+                else {
+                MatteBorder border = new MatteBorder(2, 0, 2, 0, Color.BLACK);
+                button.setBorder(border);
+            }
+        }
+    }
+    String currentRotation = "UP";
+    int currentSize = 5;
+    boolean isFinished = false;
+    JButton ship5[] = new JButton[5];
+    JButton ship4[] = new JButton[4];
+    JButton ship3[] = new JButton[3];
+    JButton ship2[] = new JButton[3];
+    JButton ship1[] = new JButton[2];
+    public JFrame getShips(JFrame frame) {
         JPanel panel = new JPanel();
-        ArrayList<Button> buttons = new ArrayList<Button>();
-        ArrayList<Button> usedCells = new ArrayList<Button>();
-        panel.setBounds(100,100,600,600);
-        panel.setLayout(new GridLayout(10,10));
-        Button rotateButton = new Button("Rotate");
+        ArrayList<JButton> buttons = new ArrayList<JButton>();
+        ArrayList<JButton> usedCells = new ArrayList<JButton>();
         
+        panel.setBounds(100,100,600,600);
+        panel.setLayout(new GridLayout(10,10,-1,0));
+        Button rotateButton = new Button("Rotate");
         rotateButton.setBounds(800,100,100,50);
         // 5, 4, 3, 3, 2
         for(int k = 1; k <= 100; k++) {
-            buttons.add(new Button("Button " + k));
+            buttons.add(new JButton(""+k));
             buttons.get(k-1).setName(k + "");
+            
             panel.add(buttons.get(k-1));
         }
-        frame.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println(e.getKeyCode());
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-            
-        });
-        for (Button button : buttons) {
+        
+        for (JButton button : buttons) {
             button.addMouseListener(new MouseListener() {
 
                 @Override
@@ -55,11 +77,9 @@ public class ShipSelector {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    for (Button button : buttons) {
-                        if (button.getBackground() == Color.LIGHT_GRAY) {
-                            usedCells.add(button);
-                            button.setBackground(Color.GRAY);
-                        }
+                    
+                    for (JButton button : buttons) {
+                        
                         if (usedCells.size() == 5) {
                             currentSize = 4;
                         }
@@ -70,10 +90,78 @@ public class ShipSelector {
                             currentSize = 2; 
                         }
                         else if (usedCells.size() == 17) {
-                            frame.remove(panel);
-                            frame.remove(rotateButton);
+                            isFinished=true;
+                            if (frame.getMouseListeners().length!=0) {
+                                frame.removeMouseListener(frame.getMouseListeners()[0]);
+                            }
+                            
+                            button.removeMouseListener(button.getMouseListeners()[0]);
+                            button.removeMouseListener(button.getMouseListeners()[0]);
+
+
                         }
-                        
+                        if (button.getBackground() == Color.LIGHT_GRAY) {
+                            if (currentSize==5) {
+                                for(int k = 0; k < ship5.length; k++) {
+                                    if (ship5[k]==null) {
+                                        createBorder(button,k);
+                                        ship5[k] = button;
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (currentSize==4) {
+                                for(int k = 0; k < ship4.length; k++) {
+                                    if (ship4[k]==null) {
+                                        createBorder(button,k);
+                                        ship4[k] = button;
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (currentSize==4) {
+                                for(int k = 0; k < ship4.length; k++) {
+                                    if (ship4[k]==null) {
+                                        createBorder(button,k);
+                                        ship4[k] = button;
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (currentSize==3&&usedCells.size()<12) {
+                                for(int k = 0; k < ship3.length; k++) {
+                                    if (ship3[k]==null) {
+                                        createBorder(button,k);
+                                        ship3[k] = button;
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else if (currentSize==3) {
+                                for(int k = 0; k < ship2.length; k++) {
+                                    if (ship2[k]==null) {
+                                        createBorder(button,k);
+                                        ship2[k] = button;
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else {
+                                for(int k = 0; k < ship1.length; k++) {
+                                    if (ship1[k]==null) {
+                                        createBorder(button,k);
+                                        ship1[k] = button;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                           
+                            button.setBackground(Color.GRAY);
+                            usedCells.add(button);
+                        }
                     }
                 }
 
@@ -83,10 +171,16 @@ public class ShipSelector {
 
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    for (Button button : buttons) {
+                    for (JButton button : buttons) {
                         if (button.getBackground() == Color.LIGHT_GRAY) {
                             button.setBackground(null);
                         }
+                    }
+                    if (isFinished) {
+                        for(int k = 0; k < ship3.length; k++) {
+                            System.err.println(ship3[k].getName());
+                        }
+                        return;
                     }
                     switch (currentRotation) {
                         case "UP":
@@ -98,6 +192,7 @@ public class ShipSelector {
                                             return;
                                         }
                                     }     
+                                    
                                     for(int i = 0; i < currentSize; i++) {
                                         buttons.get(k-((i*10)+1)).setBackground(Color.LIGHT_GRAY);
                                     }      
@@ -118,6 +213,7 @@ public class ShipSelector {
                                             return;
                                         }
                                     }
+                                    
                                     for (int i = 0; i < currentSize; i++) {
                                         buttons.get(i+k-1).setBackground(Color.LIGHT_GRAY);
                                     }
@@ -136,6 +232,7 @@ public class ShipSelector {
                                             return;
                                         }
                                     }
+                                   
                                     for(int i = 0; i < currentSize; i++) {
                                         buttons.get(k+((i*10)-1)).setBackground(Color.LIGHT_GRAY);
                                     }
@@ -147,13 +244,15 @@ public class ShipSelector {
                             try {
                                 int k = Integer.parseInt(button.getName());
                                 int remainder = k % 10;
-                                if (remainder >= currentSize && remainder != 0) {
+                                if (remainder >= currentSize) {
                                     for (int i = 0; i < currentSize; i++) {
                                         if (usedCells.contains(buttons.get(k-i-1))) {
                                             return;
                                         }
                                     }
+                                    
                                     for (int i = 0; i < currentSize; i++) {
+                                        
                                         buttons.get(k-i-1).setBackground(Color.LIGHT_GRAY);
                                     }
                                 }
@@ -198,7 +297,7 @@ public class ShipSelector {
             }
             
         });
-        return new Ship[2];
+        return frame;
     } 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Battle Ship");
@@ -207,8 +306,7 @@ public class ShipSelector {
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         frame.setLayout(null);
-        
-        System.err.println(new ShipSelector().getShips(frame).length);
+        new ShipSelector().getShips(frame);
         frame.setVisible(true);
         
 

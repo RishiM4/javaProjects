@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "wads",
+            "request": "launch",
+            "mainClass": "wads",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "ServerTest",
+            "request": "launch",
+            "mainClass": "ServerTest",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "BattleShipClient",
             "request": "launch",
             "mainClass": "battleship.BattleShipClient",

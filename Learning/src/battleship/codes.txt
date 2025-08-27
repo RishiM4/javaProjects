@@ -11,3 +11,4 @@
 0010 - Handler telling opponent that the request was declined.
 0011 - Client telling its handler that the request was accepted.
 0012 - Handler telling both clients to start the game.
+0013 - Client telling its handler that it has finished matchmaking.
