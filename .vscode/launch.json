@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "WebServer",
+            "request": "launch",
+            "mainClass": "WebServer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "wads",
             "request": "launch",
             "mainClass": "wads",
