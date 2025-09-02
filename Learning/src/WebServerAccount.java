@@ -24,8 +24,9 @@ public class WebServerAccount implements HttpHandler {
             String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             Map<String, String> params = parseFormData(body);
             String message = params.getOrDefault("message", "mkmk").trim();
+
             if (!message.isEmpty()) {
-                exchange.getResponseHeaders().add("Set-Cookie", "userID=%s; Path=/; HttpOnly".formatted(message));
+                exchange.getResponseHeaders().add("Set-Cookie", "userID=%s; Path=/; HttpOnly".formatted(escapeHtml(message)));
                 exchange.getResponseHeaders().add("Location", "/");
                 exchange.sendResponseHeaders(302, -1);
             }
@@ -39,7 +40,7 @@ public class WebServerAccount implements HttpHandler {
             <body>
                 <h2>text</h2>
                 <form method="POST" action="/account">
-                    <input type="text" name="message" required>
+                    <input type="text" name="message" required autocomplete="off">
                     <button type="submit">Send</button>
                 </form>                
             </body>
@@ -65,5 +66,8 @@ public class WebServerAccount implements HttpHandler {
             }
         }
         return map;
+    }
+    private String escapeHtml(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#x27;");
     }
 }
