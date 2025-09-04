@@ -87,7 +87,7 @@ public class WebServerHome implements HttpHandler {
                 <html>
                     <title>Chat</title>
                     <body>
-                        <h2>Enter Some Text</h2>
+                        <h2>Enter Some Text%s</h2>
                         <form method="POST" action="/">
                             <input type="text" name="message" required autocomplete="off">
                             <button type="submit">Send</button>
@@ -115,7 +115,7 @@ public class WebServerHome implements HttpHandler {
                         </script>
                     </body>
                 </html>
-            """;
+            """.formatted(System.currentTimeMillis());
 
             byte[] bytes = html.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "text/html");
