@@ -1,15 +1,214 @@
-
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Custom HTML</title>
-    </head>
-    <body>
-        
-        <h1>Hello World!</h1>
-        
-        
-        
-        
-    </body>
+<head>
+  <title>RSA Encrypt & Decrypt with Custom Keys</title>
+</head>
+<body>
+<h2>Check the browser console for output</h2>
+
+<script>
+    function openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('MyCryptoDB', 1);
+
+            request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('encryptedData')) {
+                db.createObjectStore('encryptedData', { keyPath: 'id' });
+            }
+            };
+
+            request.onsuccess = (event) => {
+            resolve(event.target.result);
+            };
+
+            request.onerror = (event) => {
+            reject(event.target.error);
+            };
+        });
+        }
+
+        // Store encrypted data
+    async function storeEncryptedData(id, data) {
+        const db = await openDatabase();
+        const tx = db.transaction('encryptedData', 'readwrite');
+        const store = tx.objectStore('encryptedData');
+        await store.put({ id, ...data });
+        return tx.complete;
+        }
+
+        // Retrieve encrypted data
+    async function getStoredEncryptedData(id) {
+        const db = await openDatabase();
+        const tx = db.transaction('encryptedData', 'readonly');
+        const store = tx.objectStore('encryptedData');
+        return new Promise((resolve, reject) => {
+            const request = store.get(id);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+  function pemToArrayBuffer(pem) {
+    const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  async function importPublicKey(pem) {
+    const binaryDer = pemToArrayBuffer(pem);
+    return crypto.subtle.importKey(
+      'spki',
+      binaryDer,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256",
+      },
+      true,
+      ["encrypt"]
+    );
+  }
+
+  async function importPrivateKey(pem) {
+    const binaryDer = pemToArrayBuffer(pem);
+    return crypto.subtle.importKey(
+      'pkcs8',
+      binaryDer,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256",
+      },
+      true,
+      ["decrypt"]
+    );
+  }
+
+  // Encrypt message
+  async function encryptMessage(publicKey, message) {
+    const encoded = new TextEncoder().encode(message);
+    const encrypted = await crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, encoded);
+    return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+  }
+
+  // Decrypt message
+  async function decryptMessage(privateKey, encryptedBase64) {
+    const binary = atob(encryptedBase64);
+    const encryptedBytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      encryptedBytes[i] = binary.charCodeAt(i);
+    }
+    const decrypted = await crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, encryptedBytes);
+    return new TextDecoder().decode(decrypted);
+  }
+async function generateAesKey() {
+    return await crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: 128, // or 256
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  // Encrypt a message with AES-GCM
+  async function encryptAesMessage(aesKey, message) {
+    const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV
+    const encoded = new TextEncoder().encode(message);
+
+    const ciphertext = await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      aesKey,
+      encoded
+    );
+
+    return {
+      iv: iv,
+      ciphertext: new Uint8Array(ciphertext),
+    };
+  }
+
+  // Decrypt the AES-GCM encrypted message
+  async function decryptAesMessage(aesKey, ciphertext, iv) {
+    const decrypted = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      aesKey,
+      ciphertext
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  // Convert ArrayBuffer or Uint8Array to Base64
+  function toBase64(buffer) {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  }
+
+  async function main() {
+    const message = "Hello from your kkjkjkkjk key!";
+
+
+    const publicKeyPem = `
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkejdUS3uXeE6wcJ7DiRKjxlnNzNgW7QNRREoroxMhFr1VrxoAqNvvTrCM6Z0M6Yd+U3z2NQVETVWJm49mtxnYFPCP1XVKDE3lMTvd7UNzqjIDIXZ1+yrqCEo9Wygg3LioDumu3yhfvZIZUkOojugIgayFE0siPdI8YzWbWfkUPq137KsdArb8mBFIena8PqT5ZaPxcqJ1ZbLTxJ1ALoP+QGRzh78szrQRNkTY8iJDmV3ig//RuYujRrb4DsdCOSd3BJGRv/hNHcpyxqomAD6ZKpIxomW/B8uMg5/5uUb0A3/yb/Hcq9mOl+0niHpj5hvRd+1qoroQdRMCaeZwo+nbwIDAQAB
+-----END PUBLIC KEY-----
+`.trim();
+
+    const privateKeyPem = `
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCR6N1RLe5d4TrBwnsOJEqPGWc3M2BbtA1FESiujEyEWvVWvGgCo2+9OsIzpnQzph35TfPY1BURNVYmbj2a3GdgU8I/VdUoMTeUxO93tQ3OqMgMhdnX7KuoISj1bKCDcuKgO6a7fKF+9khlSQ6iO6AiBrIUTSyI90jxjNZtZ+RQ+rXfsqx0CtvyYEUh6drw+pPllo/FyonVlstPEnUAug/5AZHOHvyzOtBE2RNjyIkOZXeKD/9G5i6NGtvgOx0I5J3cEkZG/+E0dynLGqiYAPpkqkjGiZb8Hy4yDn/m5RvQDf/Jv8dyr2Y6X7SeIemPmG9F37WqiuhB1EwJp5nCj6dvAgMBAAECggEADZA8M+XVUN8f3foiWUawsvZgEhFnEC8/xTSv95stfmeRgzjBYcQSnjW+RByMPxmJPhnBJLNWVVgEGaTJekH/JBpf0Lu9tF5Fi0FL/MXqXNRzauKYb7TdoiPu/EgsRaaM1ZX7TQDBZx16zluJDjYFD+oCbNZdtkpnz/h7yFt42GQfSt6qYg/13ucu+XOSRpj7PU4w5y19cnBMxgyTSe6dPwxM8LVwSXe0dT53FtypWGMuryFRoo5RvaoZ+cUAix8c5L/d498/UUHD9TDVQUZR328O8qDZ7biIHFzNzYw0cucjHyTws3h8v015tUsyKfWe59u8luJ/4porz+ksEqokPQKBgQDEzhQTB+couPAsEOvAZ4SikoYle8UC3lh9SWTHEZBVAPZTT4NVYZdBAGHIV2nQmEPiG/9hyZ/oHB44+Uc7raQz1cK+GyZiP5c+Qu0oC2cl6QlKfWmwCFrdAeXpaeubUvgqS8AqkALttOW74KJxI7cOwqRyWvu9g7YYw+uVftcKUwKBgQC9y9vwiWgiZ3Su8XfAnlkzNWg3eFVa7jvEgA60xPTxus2XsO0swtZYaTPl8EoQwL0WSetohuRsYxzMM0yPUaSpe38tlaj+2tUDdv/3rLrd0KIz8FeiQ/ypHWgcIsE8Vvm4g4WMPeaZEZDREy7h7+KLldAY3UIGl9kri0e3fBVi9QKBgQClYEJwJ4DwsE9pyCJDAPnsntHI57OKkIqtZSIhQboWJAPZyAQlmCdAwPBqKEJLvde1Ri+Y3ZPYuOAQojBgjq5fvG2z0B62CpeuAxFESCi6K5PaG37XJH4uHy0ysgYA9HyDFjp5yaAcXZl7Ae2ewxNNfPQxABFwlCBNuTza18Yd7wKBgQCbsJ66sfy6PCN7XpjdaQfC+gyDdDKQZNyiVGm739UOdi4wQPJNxYYPAD2SYYpgM7rojbqOBBlcz/DPkUU8S7zHSocI3bvDU79pGDTg9tBTJNHpyT4Z3atlDrpYWiopVS+ELF9gq2Z+KeqhlxreO+mal0odG2MOBYIgNiCeYysoAQKBgQCfpTDXGq4IT4WGNfK+Xy08clK/nz1gEYxpcpKWMbk9pIAy9XJXqg6aP8F7GWaOCFjPVp9BMu/wjj2eKoR3GbQZNSiNjwLeV4W/YXgA73kzR5t57V/Pt3g/WXtM5MpgwIvLcoC8/WZMODWJfacRfGsz9Qh+/TsWwfo1x5h+tf8fbw==
+-----END PRIVATE KEY-----
+`.trim();
+
+    try {
+      const publicKey = await importPublicKey(publicKeyPem);
+      const privateKey = await importPrivateKey(privateKeyPem);
+
+      const encrypted = await encryptMessage(publicKey, message);
+      console.log("🔐 Encrypted (base64):", encrypted);
+
+      const decrypted = await decryptMessage(privateKey, encrypted);
+      console.log("✅ Decrypted:", decrypted);
+
+      const jd = "🔐 Hello AES-GCM!";
+      console.log("Original message:", jd);
+
+        // Generate AES key
+        const aesKey = await generateAesKey();
+
+        // Encrypt
+        const { iv, ciphertext } = await encryptAesMessage(aesKey, jd);
+        console.log("Encrypted (base64):", toBase64(ciphertext));
+        console.log("IV (base64):", toBase64(iv));
+
+        // Decrypt
+        const t = await decryptAesMessage(aesKey, ciphertext, iv);
+        console.log("Decrypted:", t);
+
+        const store = 'assad';
+        await storeEncryptedData('test', { value: store });
+        const saved = await getStoredEncryptedData('test');
+        if (saved) {
+            console.log("📦 Decrypted from storage:", saved.value);
+        } else {
+            console.log("❌ No stored AES message found.");
+        }
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Decryption failed. Check console.");
+    }
+  }
+
+  main();
+</script>
+</body>
 </html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AES-GCM Encryption & Decryption</title>
+</head>
+<body>
+<h2>Open the console to see AES-GCM encryption & decryption</h2>
+
+<script>
+  // Generate a new AES key
+  async function generateAesKey() {
+    return await crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: 128, // or 256
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  // Encrypt a message with AES-GCM
+  async function encryptAesMessage(aesKey, message) {
+    const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV
+    const encoded = new TextEncoder().encode(message);
+
+    const ciphertext = await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      aesKey,
+      encoded
+    );
+
+    return {
+      iv: iv,
+      ciphertext: new Uint8Array(ciphertext),
+    };
+  }
+
+  // Decrypt the AES-GCM encrypted message
+  async function decryptAesMessage(aesKey, ciphertext, iv) {
+    const decrypted = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv: iv,
+      },
+      aesKey,
+      ciphertext
+    );
+
+    return new TextDecoder().decode(decrypted);
+  }
+
+  // Convert ArrayBuffer or Uint8Array to Base64
+  function toBase64(buffer) {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  }
+
+  // Main function
+  async function main() {
+    const message = "🔐 Hello AES-GCM!";
+    console.log("Original message:", message);
+
+    // Generate AES key
+    const aesKey = await generateAesKey();
+
+    // Encrypt
+    const { iv, ciphertext } = await encryptAesMessage(aesKey, message);
+    console.log("Encrypted (base64):", toBase64(ciphertext));
+    console.log("IV (base64):", toBase64(iv));
+
+    // Decrypt
+    const decrypted = await decryptAesMessage(aesKey, ciphertext, iv);
+    console.log("Decrypted:", decrypted);
+  }
+
+  main().catch(err => {
+    console.error("❌ Error:", err);
+  });
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@ public class WebServer {
             server.createContext("/", new WebServerHome());
             server.createContext("/create", new WebServerCreateChat());
             server.createContext("/invites", new WebServerPendingInvites());
+            server.createContext("/test", new WebServerTest());
             server.setExecutor(null);
             server.start();
             System.out.println("Server running on http://localhost:8000/");

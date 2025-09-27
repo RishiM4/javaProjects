@@ -102,7 +102,20 @@ public class WebServerHome implements HttpHandler{
                     String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                     String inputType = parseFormData(body).get("inputType");
                     System.err.println(inputType);
-                    if (inputType.equals("newMessage")) {
+                    if (inputType == null || inputType.trim().isEmpty()) {
+                        
+                        System.out.println("Received key submission:\n" + body);
+                        List<String> lines = Files.readAllLines(Paths.get("webServerPublicKeys.txt"));
+                        for(int k = 0; k < lines.size(); k++) {
+                            if (!lines.get(k).split(":::")[0].equals(getCookies(exchange).get("UUID"))) {
+                                lines.add(getCookies(exchange).get("UUID")+":::"+body);
+                            }
+                        }
+                        Files.write(Paths.get("webServerPublicKeys.txt"), lines);
+
+                        
+                    }
+                    else if (inputType.equals("newMessage")) {
                         String message = escapeHtml(parseFormData(body).getOrDefault("message", "").trim());
                         
                         if (!message.equals("")) {
@@ -345,7 +358,173 @@ public class WebServerHome implements HttpHandler{
                                     window.addEventListener('orientationchange', resizeChatWindow);
                                     window.addEventListener('load', resizeChatWindow);
                                 </script>
-                                
+                                <script>
+                                    const dbName = "cryptoKeyDB";
+                                    const storeName = "keys";
+
+                                    async function openDB() {
+                                        return new Promise((resolve, reject) => {
+                                            const request = indexedDB.open(dbName, 1);
+                                            request.onerror = () => reject("Failed to open IndexedDB");
+                                            request.onsuccess = () => resolve(request.result);
+                                            request.onupgradeneeded = e => {
+                                                const db = e.target.result;
+                                                if (!db.objectStoreNames.contains(storeName)) {
+                                                    db.createObjectStore(storeName);
+                                                }
+                                            };
+                                        });
+                                    }
+
+                                    async function storeKey(db, keyName, key) {
+                                        return new Promise((resolve, reject) => {
+                                            const tx = db.transaction(storeName, "readwrite");
+                                            const store = tx.objectStore(storeName);
+                                            const request = store.put(key, keyName);
+                                            request.onsuccess = () => resolve();
+                                            request.onerror = () => reject("Failed to store key " + keyName);
+                                        });
+                                    }
+
+                                    async function getKey(db, keyName) {
+                                        return new Promise((resolve, reject) => {
+                                            const tx = db.transaction(storeName, "readonly");
+                                            const store = tx.objectStore(storeName);
+                                            const request = store.get(keyName);
+                                            request.onsuccess = () => resolve(request.result);
+                                            request.onerror = () => reject("Failed to get key " + keyName);
+                                        });
+                                    }
+
+                                    async function generateAESKey() {
+                                        const key = await crypto.subtle.generateKey(
+                                            {
+                                            name: "AES-GCM",
+                                            length: 128,
+                                            },
+                                            true,
+                                            ["encrypt", "decrypt"]
+                                        );
+                                        return key;
+                                    }
+async function clearKeys() {
+    const db = await openDB();
+    const tx = db.transaction(storeName, "readwrite");
+    const store = tx.objectStore(storeName);
+    await Promise.all([
+        store.delete("rsaPrivateKey"),
+        store.delete("rsaPublicKey")
+    ]);
+    await tx.complete;
+}
+                                    async function exportAESKey(key) {
+                                        const raw = await crypto.subtle.exportKey("raw", key);
+                                        return btoa(String.fromCharCode(...new Uint8Array(raw)));
+                                    }
+
+                                    async function generateRSAKeyPair() {
+                                        const keyPair = await crypto.subtle.generateKey(
+                                            {
+                                            name: "RSA-OAEP",
+                                            modulusLength: 1024,
+                                            publicExponent: new Uint8Array([1, 0, 1]),
+                                            hash: "SHA-256",
+                                            },
+                                            true, // PRIVATE key is NOT extractable for security
+                                            ["encrypt", "decrypt"]
+                                        );
+                                        return keyPair;
+                                    }
+
+                                    async function exportRSAPublicKey(key) {
+                                        const spki = await crypto.subtle.exportKey("spki", key);
+                                        return btoa(String.fromCharCode(...new Uint8Array(spki)));
+                                    }
+                                    async function exportRSAPrivateKey(key) {
+                                        const spki = await crypto.subtle.exportKey("pkcs8", key);
+                                        return btoa(String.fromCharCode(...new Uint8Array(spki)));
+                                    }
+                                        async function encryptWithPublicKey(publicKey, plaintext) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plaintext);
+
+  const encryptedBuffer = await crypto.subtle.encrypt(
+    {
+      name: "RSA-OAEP"
+    },
+    publicKey,
+    data
+  );
+
+  // Convert to base64
+  return btoa(String.fromCharCode(...new Uint8Array(encryptedBuffer)));
+}
+async function importRSAPublicKey(pemBase64) {
+  const binaryDer = Uint8Array.from(atob(pemBase64), c => c.charCodeAt(0));
+  return crypto.subtle.importKey(
+    "spki",
+    binaryDer.buffer,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    },
+    true,
+    ["encrypt"]
+  );
+}
+
+                                    async function main() {
+    try {
+        const db = await openDB();
+
+        // Get or generate AES key
+        let aesKey = await getKey(db, "aesKey");
+        if (!aesKey) {
+            aesKey = await generateAESKey();
+            await storeKey(db, "aesKey", aesKey);
+        }
+        const aesKeyB64 = await exportAESKey(aesKey);
+
+        // Get or generate RSA key pair
+        let rsaKeyPair = {
+            publicKey: await getKey(db, "rsaPublicKey"),
+            privateKey: await getKey(db, "rsaPrivateKey")
+        };
+
+        if (!rsaKeyPair.publicKey || !rsaKeyPair.privateKey) {
+            rsaKeyPair = await generateRSAKeyPair();
+            await storeKey(db, "rsaPublicKey", rsaKeyPair.publicKey);
+            await storeKey(db, "rsaPrivateKey", rsaKeyPair.privateKey);
+        }
+
+        // Export both RSA keys
+        const rsaPublicKeyB64 = await exportRSAPublicKey(rsaKeyPair.publicKey);
+        const rsaPrivateKeyB64 = await exportRSAPrivateKey(rsaKeyPair.privateKey);
+        const publicKeyImported = await importRSAPublicKey(rsaPublicKeyB64);
+        const plaintext = "Hello, encrypt me with RSA!";
+        const encryptedText = await encryptWithPublicKey(publicKeyImported, plaintext);
+        console.log("Encrypted Text (Base64):", encryptedText);
+        // Send all keys to the server
+        await fetch("/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                aesKey: aesKeyB64,
+                rsaPublicKey: rsaPublicKeyB64,
+                rsaPrivateKey: rsaPrivateKeyB64
+            })
+        });
+
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}
+
+//clearKeys().then(() => main());
+main();
+                                </script>
                             </body>
                         </html>
 
@@ -521,3 +700,7 @@ public class WebServerHome implements HttpHandler{
 //add commands such as /help /msg /server 
 //add parameter to chat logging to show to which users the message should be displayed to. this will be useful for any future messages
 //when you switch your username, the origin of messages, and pending users should also switch.
+//so we have a list of all the public keys of the users, now we need to make it so that the client will generate a brand new key,
+//then encrypt it with the encryption key, then take the decryption key and encrypt it with the all the other user's public keys
+//we also need to make it so specific chat messages are only rendered for their specified users, this allows us to serve each user 
+//their designated message, the users also need to be able to decrypt it with a key.
