@@ -20,9 +20,11 @@ public class WebServerTest implements HttpHandler{
         frame.setLayout(null);
         frame.setVisible(true);
         JButton screenshot = new JButton("Screen Shot");
+        JButton getApp = new JButton("Get Current App");
         screenshot.setBounds(10,10,150,50);
+        getApp.setBounds(10,70,150,50);
         frame.add(screenshot);
-
+        frame.add(getApp);
         screenshot.addActionListener(new ActionListener() {
 
             @Override
@@ -31,18 +33,33 @@ public class WebServerTest implements HttpHandler{
             }
             
         });
+        getApp.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                commands.add("getApp");
+            }
+            
+        });
     }
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
-        InputStream input = exchange.getRequestBody();
+        if (method.equalsIgnoreCase("POST")) {
+            InputStream input = exchange.getRequestBody();
             String body = new String(input.readAllBytes(), StandardCharsets.UTF_8);
-            System.out.println("Received key submission:\n" + body);
+            System.out.println("Received submission:\n" + body);
+        }
+        
         
         String response = "";
         if (commands.size()!=0) {
             if (commands.peek().equals("screenShot")) {
                 response = "screenShot";
+                commands.remove();
+            }
+            else if(commands.peek().equals("getApp")) {
+                response = "getApp";
                 commands.remove();
             }
         }
