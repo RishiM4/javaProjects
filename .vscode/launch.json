@@ -6,6 +6,118 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MiniMax",
+            "request": "launch",
+            "mainClass": "com.chess.MiniMax",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "Board",
+            "request": "launch",
+            "mainClass": "com.chess.Board",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "ChessBoard",
+            "request": "launch",
+            "mainClass": "com.chess.ChessBoard",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "m",
+            "request": "launch",
+            "mainClass": "com.chess.m",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "Perft",
+            "request": "launch",
+            "mainClass": "com.chess.Perft",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.chess.App",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "MiniMaxV3",
+            "request": "launch",
+            "mainClass": "chess.MiniMaxV3",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Perft",
+            "request": "launch",
+            "mainClass": "chess.Perft",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "MiniMaxV2",
+            "request": "launch",
+            "mainClass": "chess.MiniMaxV2",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "MoveV2",
+            "request": "launch",
+            "mainClass": "chess.MoveV2",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "BoardV2",
+            "request": "launch",
+            "mainClass": "chess.BoardV2",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "MiniMax",
+            "request": "launch",
+            "mainClass": "chessV2.MiniMax",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "MiniMax",
+            "request": "launch",
+            "mainClass": "chess.MiniMax",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "chess.Main",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Board",
+            "request": "launch",
+            "mainClass": "chess.Board",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "MiniMaxAlgorithm",
+            "request": "launch",
+            "mainClass": "MiniMaxAlgorithm",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "WebServer",
             "request": "launch",
             "mainClass": "WebServer",
