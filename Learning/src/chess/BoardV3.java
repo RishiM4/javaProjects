@@ -1,13 +1,4 @@
 package chess;
-/*
- * BoardV3.java
- *
- * Single-file Java implementation of a chess board with move generation using
- * magic bitboards for sliding pieces, precomputed attack tables for knights,
- * kings, pawns, check detection, make/unmake moves and a perft tester.
- *
- * Corrected make/unmake, en-passant, and castling checks to pass perft.
- */
 
 import java.util.*;
 
@@ -22,52 +13,62 @@ public final class BoardV3 {
     public static final int QUEEN = 4;
     public static final int KING = 5;
 
-    // piece bitboards: index = color*6 + pieceType
-    public long[] pieceBB = new long[6 * 2];
-    private long[] occupancy = new long[3]; // [WHITE, BLACK, BOTH]
+    public long[] pieceBB = new long[12];
+    private long[] occupancy = new long[3];
     public int sideToMove = WHITE;
-    private int castlingRights = 0; // bits: 1 K, 2 Q, 4 k, 8 q
-    private int enPassantSquare = -1; // square index or -1
+    private int castlingRights = 0; 
+    private int enPassantSquare = -1; 
     private int halfmoveClock = 0;
-
+    private int currentPhase = 0;
     private static final int[] RANK = new int[64];
     private static final int[] FILE = new int[64];
-    private static final long[] SQUARE_BB = new long[64];
-    static {
+    private final long[] SQUARE_BB = new long[64];
+    
+    private final long FILE_A = 0x0101010101010101L;
+    private final long FILE_H = 0x8080808080808080L;
+
+    private final long[] KNIGHT_ATTACKS = new long[64];
+    private final long[] KING_ATTACKS = new long[64];
+    private final long[] WHITE_PAWN_ATTACKS = new long[64];
+    private final long[] BLACK_PAWN_ATTACKS = new long[64];
+
+    private final long[] ROOK_MAGIC = new long[64];
+    private final long[] BISHOP_MAGIC = new long[64];
+    private final int[] ROOK_RELEVANT_BITS = new int[64];
+    private final int[] BISHOP_RELEVANT_BITS = new int[64];
+
+    private final long[][] ROOK_ATTACKS = new long[64][];
+    private final long[][] BISHOP_ATTACKS = new long[64][];
+
+    private final long[] ROOK_OCC_MASK = new long[64];
+    private final long[] BISHOP_OCC_MASK = new long[64];
+
+    private static final int[] PHASE_WEIGHTS = {
+        0,  // Pawn
+        1,  // Knight
+        1,  // Bishop
+        2,  // Rook
+        4,  // Queen
+        0   // King
+    };
+
+    private static final int[][] WHITE_PST = new int[12][64];
+    private static final int[][] BLACK_PST = new int[12][64];
+    
+    public BoardV3() {
         for (int sq = 0; sq < 64; sq++) {
             RANK[sq] = sq >> 3;
             FILE[sq] = sq & 7;
             SQUARE_BB[sq] = 1L << sq;
         }
-    }
-
-    // files for pawn attack shifts
-    private static final long FILE_A = 0x0101010101010101L;
-    private static final long FILE_H = 0x8080808080808080L;
-
-    private static final long[] KNIGHT_ATTACKS = new long[64];
-    private static final long[] KING_ATTACKS = new long[64];
-    private static final long[] WHITE_PAWN_ATTACKS = new long[64];
-    private static final long[] BLACK_PAWN_ATTACKS = new long[64];
-
-    private static final long[] ROOK_MAGIC = new long[64];
-    private static final long[] BISHOP_MAGIC = new long[64];
-    private static final int[] ROOK_RELEVANT_BITS = new int[64];
-    private static final int[] BISHOP_RELEVANT_BITS = new int[64];
-
-    private static final long[][] ROOK_ATTACKS = new long[64][];
-    private static final long[][] BISHOP_ATTACKS = new long[64][];
-
-    private static final long[] ROOK_OCC_MASK = new long[64];
-    private static final long[] BISHOP_OCC_MASK = new long[64];
-
-    static {
+        setFEN("startpos");
         initKnightKingPawnAttacks();
         initMagicMasksAndNumbers();
         initSlidingAttackTables();
+        initPST();
     }
-
-    private static void initKnightKingPawnAttacks() {
+    
+    private void initKnightKingPawnAttacks() {
         for (int sq = 0; sq < 64; sq++) {
             long na = 0L, ka = 0L, wpa = 0L, bpa = 0L;
             int r = RANK[sq], f = FILE[sq];
@@ -95,8 +96,129 @@ public final class BoardV3 {
             BLACK_PAWN_ATTACKS[sq] = bpa; // attacks from a black pawn on sq
         }
     }
+    private void initPST() {
+        // Pawn MG
+        WHITE_PST[0] = new int[] {
+            0, 0, 0, 0, 0, 0, 0, 0,
+            5,10,10,-20,-20,10,10,5,
+            5,-5,-10,0,0,-10,-5,5,
+            0,0,0,20,20,0,0,0,
+            5,5,10,25,25,10,5,5,
+            10,10,20,30,30,20,10,10,
+            50,50,50,50,50,50,50,50,
+            0,0,0,0,0,0,0,0
+        };
+        // Pawn EG
+        WHITE_PST[1] = WHITE_PST[0];
 
-    private static void initMagicMasksAndNumbers() {
+        // Knight MG
+        WHITE_PST[2] = new int[] {
+            -50,-40,-30,-30,-30,-30,-40,-50,
+            -40,-20,0,0,0,0,-20,-40,
+            -30,0,10,15,15,10,0,-30,
+            -30,5,15,20,20,15,5,-30,
+            -30,0,15,20,20,15,0,-30,
+            -30,5,10,15,15,10,5,-30,
+            -40,-20,0,5,5,0,-20,-40,
+            -50,-40,-30,-30,-30,-30,-40,-50
+        };
+        // Knight EG
+        WHITE_PST[3] = new int[] {
+            -50,-40,-30,-30,-30,-30,-40,-50,
+            -40,-20,0,5,5,0,-20,-40,
+            -30,0,10,15,15,10,0,-30,
+            -30,5,15,20,20,15,5,-30,
+            -30,0,15,20,20,15,0,-30,
+            -30,5,10,15,15,10,5,-30,
+            -40,-20,0,5,5,0,-20,-40,
+            -50,-40,-30,-30,-30,-30,-40,-50
+        };
+
+        // Bishop MG
+        WHITE_PST[4] = new int[] {
+            -20,-10,-10,-10,-10,-10,-10,-20,
+            -10,0,0,0,0,0,0,-10,
+            -10,0,5,10,10,5,0,-10,
+            -10,5,5,10,10,5,5,-10,
+            -10,0,10,10,10,10,0,-10,
+            -10,10,10,10,10,10,10,-10,
+            -10,5,0,0,0,0,5,-10,
+            -20,-10,-10,-10,-10,-10,-10,-20
+        };
+        // Bishop EG
+        WHITE_PST[5] = new int[] {
+            -20,-10,-10,-10,-10,-10,-10,-20,
+            -10,0,5,10,10,5,0,-10,
+            -10,5,10,15,15,10,5,-10,
+            -10,5,10,15,15,10,5,-10,
+            -10,0,10,10,10,10,0,-10,
+            -10,5,10,10,10,10,5,-10,
+            -10,0,0,0,0,0,0,-10,
+            -20,-10,-10,-10,-10,-10,-10,-20
+        };
+
+        // Rook MG
+        WHITE_PST[6] = new int[] {
+            0,0,0,5,5,0,0,0,
+        -5,0,0,0,0,0,0,-5,
+        -5,0,0,0,0,0,0,-5,
+        -5,0,0,0,0,0,0,-5,
+        -5,0,0,0,0,0,0,-5,
+        -5,0,0,0,0,0,0,-5,
+            5,10,10,10,10,10,10,5,
+            0,0,0,0,0,0,0,0
+        };
+        // Rook EG
+        WHITE_PST[7] = WHITE_PST[6];
+
+        // Queen MG
+        WHITE_PST[8] = new int[] {
+            -20,-10,-10,-5,-5,-10,-10,-20,
+            -10,0,0,0,0,0,0,-10,
+            -10,0,5,5,5,5,0,-10,
+            -5,0,5,5,5,5,0,-5,
+            0,0,5,5,5,5,0,-5,
+            -10,5,5,5,5,5,0,-10,
+            -10,0,5,0,0,0,0,-10,
+            -20,-10,-10,-5,-5,-10,-10,-20
+        };
+        // Queen EG
+        WHITE_PST[9] = WHITE_PST[8];
+
+        // King MG
+        WHITE_PST[10] = new int[] {
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -20,-30,-30,-40,-40,-30,-30,-20,
+            -10,-20,-20,-20,-20,-20,-20,-10,
+            20,20,0,0,0,0,20,20,
+            20,30,10,0,0,10,30,20
+        };
+        // King EG
+        WHITE_PST[11] = new int[] {
+            -50,-40,-30,-20,-20,-30,-40,-50,
+            -30,-20,-10,0,0,-10,-20,-30,
+            -30,-10,20,30,30,20,-10,-30,
+            -30,-10,30,40,40,30,-10,-30,
+            -30,-10,30,40,40,30,-10,-30,
+            -30,-10,20,30,30,20,-10,-30,
+            -30,-30,0,0,0,0,-30,-30,
+            -50,-30,-30,-30,-30,-30,-30,-50
+        };
+
+        for (int piece = 0; piece < 12; piece++) {
+            BLACK_PST[piece] = new int[64];
+            for (int rank = 0; rank < 8; rank++) {
+                for (int file = 0; file < 8; file++) {
+                    BLACK_PST[piece][rank*8 + file] = WHITE_PST[piece][(7-rank)*8 + file];
+                }
+            }
+        }
+    }
+
+    private void initMagicMasksAndNumbers() {
         int[] rookBits = {
             12,11,11,11,11,11,11,12,
             11,10,10,10,10,10,10,11,
@@ -166,8 +288,7 @@ public final class BoardV3 {
             BISHOP_OCC_MASK[sq] = bishopOccupancyMask(sq);
         }
     }
-
-    private static long bishopOccupancyMask(int sq) {
+    private long bishopOccupancyMask(int sq) {
         long mask = 0L;
         int r = RANK[sq], f = FILE[sq];
         int rr, ff;
@@ -181,8 +302,7 @@ public final class BoardV3 {
         while (rr > 0 && ff > 0) { mask |= 1L << (rr*8 + ff); rr--; ff--; }
         return mask;
     }
-
-    private static long rookOccupancyMask(int sq) {
+    private long rookOccupancyMask(int sq) {
         long mask = 0L;
         int r = RANK[sq], f = FILE[sq];
         int rr, ff;
@@ -196,8 +316,7 @@ public final class BoardV3 {
         while (ff > 0) { mask |= 1L << (rr*8 + ff); ff--; }
         return mask;
     }
-
-    private static long slidingAttacksOnTheFly(int sq, long block, boolean isRook) {
+    private long slidingAttacksOnTheFly(int sq, long block, boolean isRook) {
         long attacks = 0L;
         int r = RANK[sq], f = FILE[sq];
         int rr, ff;
@@ -222,8 +341,7 @@ public final class BoardV3 {
         }
         return attacks;
     }
-
-    private static void initSlidingAttackTables() {
+    private void initSlidingAttackTables() {
         for (int sq = 0; sq < 64; sq++) {
             int rBits = ROOK_RELEVANT_BITS[sq];
             int bBits = BISHOP_RELEVANT_BITS[sq];
@@ -245,8 +363,7 @@ public final class BoardV3 {
             }
         }
     }
-
-    private static long indexToOccupancy(int index, int bits, long mask) {
+    private long indexToOccupancy(int index, int bits, long mask) {
         long occ = 0L;
         long bb = mask;
         for (int i = 0; i < bits; i++) {
@@ -256,26 +373,20 @@ public final class BoardV3 {
         }
         return occ;
     }
-
-    private static long rookAttacks(int sq, long occ) {
+    private long rookAttacks(int sq, long occ) {
         occ &= ROOK_OCC_MASK[sq];
         int key = (int)((occ * ROOK_MAGIC[sq]) >>> (64 - ROOK_RELEVANT_BITS[sq]));
         return ROOK_ATTACKS[sq][key];
     }
-    private static long bishopAttacks(int sq, long occ) {
+    private long bishopAttacks(int sq, long occ) {
         occ &= BISHOP_OCC_MASK[sq];
         int key = (int)((occ * BISHOP_MAGIC[sq]) >>> (64 - BISHOP_RELEVANT_BITS[sq]));
         return BISHOP_ATTACKS[sq][key];
     }
-    private static long queenAttacks(int sq, long occ) {
+    private long queenAttacks(int sq, long occ) {
         return rookAttacks(sq, occ) | bishopAttacks(sq, occ);
     }
-
-
-    public BoardV3() {
-        setFEN("startpos");
-    }
-
+    
     public void setFEN(String fen) {
         clear();
         if (fen.equals("startpos")) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -310,7 +421,6 @@ public final class BoardV3 {
         if (parts.length > 4) halfmoveClock = Integer.parseInt(parts[4]);
         recomputeOccupancy();
     }
-
     private void clear() {
         Arrays.fill(pieceBB, 0L);
         Arrays.fill(occupancy, 0L);
@@ -319,7 +429,6 @@ public final class BoardV3 {
         enPassantSquare = -1;
         halfmoveClock = 0;
     }
-
     private void placePieceFromChar(char c, int sq) {
         int color = Character.isUpperCase(c) ? WHITE : BLACK;
         char lc = Character.toLowerCase(c);
@@ -335,7 +444,6 @@ public final class BoardV3 {
         }
         pieceBB[color*6 + type] |= 1L << sq;
     }
-
     private void recomputeOccupancy() {
         long w = 0L, b = 0L;
         for (int p = 0; p < 6; p++) {
@@ -346,8 +454,7 @@ public final class BoardV3 {
         occupancy[BLACK] = b;
         occupancy[2] = w | b;
     }
-
-    private static int algebraicToSquare(String sq) {
+    private int algebraicToSquare(String sq) {
         int f = sq.charAt(0) - 'a';
         int r = sq.charAt(1) - '1';
         return r*8 + f;
@@ -356,8 +463,6 @@ public final class BoardV3 {
         int f = FILE[sq]; int r = RANK[sq];
         return "" + (char)('a' + f) + (char)('1' + r);
     }
-
-
     public static final class Move {
         public final int from, to;
         public final int piece;
@@ -374,16 +479,13 @@ public final class BoardV3 {
             return squareToAlgebraic(from) + (isCapture ? "x" : "-") + squareToAlgebraic(to) + prom + (isCastle?" c":"");
         }
     }
-
     private static char pieceChar(int p) {
         switch (p) { case PAWN: return 'P'; case KNIGHT: return 'N'; case BISHOP: return 'B'; case ROOK: return 'R'; case QUEEN: return 'Q'; case KING: return 'K'; }
         return '?';
     }
-
     public List<Move> generateLegalMoves() {
         List<Move> moves = new ArrayList<>();
         generatePseudoLegalMoves(moves);
-        // Filter illegal (king-in-check) moves
         Iterator<Move> it = moves.iterator();
         while (it.hasNext()) {
             Move m = it.next();
@@ -395,7 +497,6 @@ public final class BoardV3 {
         }
         return moves;
     }
-
     private void generatePseudoLegalMoves(List<Move> out) {
         int us = sideToMove;
         int them = us ^ 1;
@@ -474,7 +575,6 @@ public final class BoardV3 {
             }
         }
     }
-
     private void addSlidingMoves(List<Move> out, int from, long attacks, int piece) {
         long t = attacks;
         int them = sideToMove ^ 1;
@@ -484,7 +584,6 @@ public final class BoardV3 {
             out.add(new Move(from,to,piece,-1,cap,false,false));
         }
     }
-
     private void generatePawnMoves(List<Move> out, int from, int us, long occ) {
         int them = us ^ 1;
         if (us == WHITE) {
@@ -549,8 +648,6 @@ public final class BoardV3 {
             }
         }
     }
-
-    // robust UndoData: copy of pieceBB and occupancy plus other ephemeral data
     static final class UndoData {
         long[] pieceBBcopy = new long[12];
         long[] occCopy = new long[3];
@@ -558,9 +655,9 @@ public final class BoardV3 {
         int oldEP;
         int oldHalfmove;
     }
-
-    // makeMove: updates pieceBB/occupancy/state; records full copy of arrays into UndoData
     public UndoData makeMove(Move m) {
+
+        updatePhase();
         UndoData ud = new UndoData();
         // save full board arrays and state
         System.arraycopy(pieceBB, 0, ud.pieceBBcopy, 0, 12);
@@ -664,8 +761,6 @@ public final class BoardV3 {
         sideToMove = them;
         return ud;
     }
-
-    // unmakeMove: restore full saved arrays & state
     public void unmakeMove(Move m, UndoData ud) {
         System.arraycopy(ud.pieceBBcopy, 0, pieceBB, 0, 12);
         System.arraycopy(ud.occCopy, 0, occupancy, 0, 3);
@@ -674,11 +769,8 @@ public final class BoardV3 {
         halfmoveClock = ud.oldHalfmove;
         sideToMove ^= 1;
     }
-
-    // isSquareAttacked: robust implementation using bitboard pawn-shifts + attacks
     public boolean isSquareAttacked(int sq, int byColor) {
         long occ = occupancy[2];
-        long attackers;
         if (byColor == WHITE) {
             long whitePawns = occupancy[WHITE] & pieceBB[WHITE*6 + PAWN];
             // squares attacked by white pawns:
@@ -699,14 +791,12 @@ public final class BoardV3 {
         if ((KING_ATTACKS[sq] & pieceBB[byColor*6 + KING]) != 0) return true;
         return false;
     }
-
     public boolean isKingAttacked(int color) {
         long kingBB = pieceBB[color*6 + KING];
         if (kingBB == 0) return false;
         int ksq = Long.numberOfTrailingZeros(kingBB);
         return isSquareAttacked(ksq, color^1);
     }
-
     public long perft(int depth) {
         if (depth == 0) return 1;
         List<Move> moves = generateLegalMoves();
@@ -719,7 +809,6 @@ public final class BoardV3 {
         }
         return nodes;
     }
-
     public String toStringBoard() {
         StringBuilder sb = new StringBuilder();
         for (int r = 7; r >= 0; r--) {
@@ -746,8 +835,7 @@ public final class BoardV3 {
         sb.append("\n");
         return sb.toString();
     }
-
-    public static void prettyPrintBitboard(long bb) {
+    public void prettyPrintBitboard(long bb) {
         for (int r = 7; r >= 0; r--) {
             for (int f = 0; f < 8; f++) {
                 int sq = r*8 + f;
@@ -758,12 +846,125 @@ public final class BoardV3 {
         }
         System.out.println();
     }
+    
+    private void updatePhase() {
+        int phase = 0;
 
+        for (int piece = 0; piece < 6; piece++) {
+            phase += Long.bitCount(pieceBB[piece]) * PHASE_WEIGHTS[piece];
+        }
+
+        for (int piece = 0; piece < 6; piece++) {
+            phase += Long.bitCount(pieceBB[6 + piece]) * PHASE_WEIGHTS[piece];
+        }
+
+        if (phase > 24) currentPhase = 24;
+        currentPhase = (24 - phase) / 24;
+        
+    }
+    public int evaluate() {
+        int position = 0;
+        long mask = pieceBB[(WHITE*6) + PAWN];
+        while (mask != 0) {
+
+            int square = Long.numberOfTrailingZeros(mask);
+            
+            int pieceValue = 100 + ((1-currentPhase) * (WHITE_PST[PAWN * 2][square]) + currentPhase * (WHITE_PST[(PAWN * 2) + 1][square]));
+            position += pieceValue;
+            if (square == 28) {
+                System.err.println("HIIIII" + pieceValue);
+            }
+            mask &= ~(1L << square);
+        }
+
+        mask = pieceBB[(WHITE*6) + KNIGHT];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue = 320 + ((1-currentPhase) * (WHITE_PST[KNIGHT * 2][square]) + currentPhase * (WHITE_PST[(KNIGHT * 2) + 1][square]));
+            position += pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(WHITE*6) + BISHOP];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue = 330 + ((1-currentPhase) * (WHITE_PST[BISHOP * 2][square]) + currentPhase * (WHITE_PST[(BISHOP * 2) + 1][square]));
+            position += pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(WHITE*6) + ROOK];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue = 500 + ((1-currentPhase) * (WHITE_PST[ROOK * 2][square]) + currentPhase * (WHITE_PST[(ROOK * 2) + 1][square]));
+            position += pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(WHITE*6) + QUEEN];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue = 900 + ((1-currentPhase) * (WHITE_PST[QUEEN * 2][square]) + currentPhase * (WHITE_PST[(QUEEN * 2) + 1][square]));
+            position += pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(WHITE*6) + KING];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue = ((1-currentPhase) * (WHITE_PST[KING * 2][square]) + currentPhase * (WHITE_PST[(KING * 2) + 1][square]));
+            position += pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(BLACK*6) + PAWN];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue =  100 + (((1-currentPhase) * (BLACK_PST[PAWN * 2][square]) + currentPhase * (BLACK_PST[(PAWN * 2) + 1][square])));
+            position -= pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(BLACK*6) + KNIGHT];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue =  320 + (((1-currentPhase) * (BLACK_PST[KNIGHT * 2][square]) + currentPhase * (BLACK_PST[(KNIGHT * 2) + 1][square])));
+            position -= pieceValue;
+            mask &= ~(1L << square);
+        
+        }
+        mask = pieceBB[(BLACK*6) + BISHOP];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue =  330 + (((1-currentPhase) * (BLACK_PST[BISHOP * 2][square]) + currentPhase * (BLACK_PST[(BISHOP * 2) + 1][square])));
+            position -= pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(BLACK*6) + ROOK];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue =  500 + (((1-currentPhase) * (BLACK_PST[ROOK * 2][square]) + currentPhase * (BLACK_PST[(ROOK * 2) + 1][square])));
+            position -= pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(BLACK*6) + QUEEN];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue =  900 + (((1-currentPhase) * (BLACK_PST[QUEEN * 2][square]) + currentPhase * (BLACK_PST[(QUEEN * 2) + 1][square])));
+            position -= pieceValue;
+            mask &= ~(1L << square);
+        }
+        mask = pieceBB[(BLACK*6) + KING];
+        while (mask != 0) {
+            int square = Long.numberOfTrailingZeros(mask);
+            int pieceValue = (((1-currentPhase) * (BLACK_PST[KING * 2][square]) + currentPhase * (BLACK_PST[(KING * 2) + 1][square])));
+            position -= pieceValue;
+            mask &= ~(1L << square);
+        }
+        return position;
+    }
+    //bit 1 is a1 and array[0]...
     public static void main(String[] args) {
         BoardV3 cb = new BoardV3();
+        cb.setFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+        System.err.println(cb.evaluate());
         System.out.println("Default starting position:");
         System.out.println(cb.toStringBoard());
-        int[] depths = {1,2,3,4,5,6};
+        int[] depths = {1,2,3,4};
         for (int d : depths) {
             long start = System.nanoTime();
             long nodes = cb.perft(d);
@@ -771,5 +972,7 @@ public final class BoardV3 {
             double sec = (end - start) / 1e9;
             System.out.printf("perft(%d) = %d   time=%.10fs\n", d, nodes, sec);
         }
+        System.err.println(cb.evaluate());
+        
     }
 }

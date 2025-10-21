@@ -1,7 +1,5 @@
 package chess;
 
-import java.util.Scanner;
-
 public class MiniMaxV2 {
 
     private static final int INF = 1000000;
@@ -92,7 +90,6 @@ public class MiniMaxV2 {
     
     public static void main(String[] args) {
         BoardV2 board = new BoardV2();
-        Scanner scanner = new Scanner(System.in);
         board.printBoard();
         while (true) {
             int best = findBestMove(board, 5, 1);
@@ -100,11 +97,6 @@ public class MiniMaxV2 {
             board.makeMove(best, 1);
             board.printBoard();
 
-            String input = scanner.nextLine();
-            int to = toSquareNumber(input.split(",")[1]);
-            //int move = MoveV2.encode(from, to, capture, false, false);
-            //board.makeMove(move, -1);
-            scanner.close();
         }
     }
 }
