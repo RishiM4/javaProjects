@@ -846,7 +846,14 @@ public final class BoardV3 {
         }
         System.out.println();
     }
-    
+    public boolean isMate(int turn) {
+        if (turn == 1) {
+            return isKingAttacked(WHITE);
+        }
+        else {
+            return isKingAttacked(BLACK);
+        }
+    }
     private void updatePhase() {
         int phase = 0;
 
@@ -871,9 +878,7 @@ public final class BoardV3 {
             
             int pieceValue = 100 + ((1-currentPhase) * (WHITE_PST[PAWN * 2][square]) + currentPhase * (WHITE_PST[(PAWN * 2) + 1][square]));
             position += pieceValue;
-            if (square == 28) {
-                System.err.println("HIIIII" + pieceValue);
-            }
+            
             mask &= ~(1L << square);
         }
 
@@ -961,6 +966,7 @@ public final class BoardV3 {
     public static void main(String[] args) {
         BoardV3 cb = new BoardV3();
         cb.setFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+        
         System.err.println(cb.evaluate());
         System.out.println("Default starting position:");
         System.out.println(cb.toStringBoard());

@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MiniMaxV4",
+            "request": "launch",
+            "mainClass": "chess.MiniMaxV4",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "BoardV3",
             "request": "launch",
             "mainClass": "chess.BoardV3",
