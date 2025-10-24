@@ -11,23 +11,27 @@ public class GamePlayer {
 }
 /*
     TO DO: 
-    1. Move ordering for alpha beta
-    2. Quiescence search(search all positions until there are no checks or captures)
-    3. Zobrist hashing + transposition tables (avoid repeat positions, with hashing to efficiently save the board state)
-    4. Iterative deepening 
-    5. Early-game lookup tables
-    6. Endgame move tables
-    7. Anti 50-move rule
+    1. Quiescence search(search all positions until there are no checks or captures)
+    2. Zobrist hashing + transposition tables (avoid repeat positions, with hashing to efficiently save the board state)
+    3. Opening lookup tables
+    4. Endgame move tables (Syzygy tablebase)
+    5. Anti 50-move rule/ 3 fold repitition
+    6. Enhanced eval function (king safety, defended pawns, doubled pawns, passed pawns, etc)
+    7. Multi-threading
+    8. NNUE
 */
 
 /*
     COMPLETED:
     1. Alpha-beta pruning
+    2. Move ordering for alpha beta (75% faster minimax)
+    3. Iterative deepening (84% faster minimax)
+
 */
 
 /*
     BENCHMARKS
-    1. MiniMaxV3 - tested on chess.com, beat 1500 but lost to 2000
+    1. MiniMaxV4 - tested on chess.com, beat 1500 but lost to 2000
 */
 
 /*

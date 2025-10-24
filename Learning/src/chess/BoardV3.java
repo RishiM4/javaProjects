@@ -470,7 +470,7 @@ public final class BoardV3 {
         public final boolean isCapture;
         public final boolean isEnPassant;
         public final boolean isCastle;
-
+        public int weight = 0;
         public Move(int from, int to, int piece, int promotion, boolean isCapture, boolean isEnPassant, boolean isCastle) {
             this.from = from; this.to = to; this.piece = piece; this.promotion = promotion; this.isCapture = isCapture; this.isEnPassant = isEnPassant; this.isCastle = isCastle;
         }
@@ -489,9 +489,8 @@ public final class BoardV3 {
         Iterator<Move> it = moves.iterator();
         while (it.hasNext()) {
             Move m = it.next();
-            int mover = sideToMove;                     // save mover color
             UndoData ud = makeMove(m);
-            boolean ok = !isKingAttacked(mover);       // test if mover's king is attacked after move
+            boolean ok = !isKingAttacked(sideToMove ^1);       // test if mover's king is attacked after move
             unmakeMove(m, ud);
             if (!ok) it.remove();
         }
@@ -654,9 +653,10 @@ public final class BoardV3 {
         int oldCastling;
         int oldEP;
         int oldHalfmove;
+        int oldSideToMove;
     }
     public UndoData makeMove(Move m) {
-
+        
         updatePhase();
         UndoData ud = new UndoData();
         // save full board arrays and state
@@ -665,7 +665,7 @@ public final class BoardV3 {
         ud.oldCastling = castlingRights;
         ud.oldEP = enPassantSquare;
         ud.oldHalfmove = halfmoveClock;
-
+        ud.oldSideToMove = sideToMove;
         int us = sideToMove;
         int them = us ^ 1;
         long fromBB = 1L << m.from;
@@ -767,7 +767,8 @@ public final class BoardV3 {
         castlingRights = ud.oldCastling;
         enPassantSquare = ud.oldEP;
         halfmoveClock = ud.oldHalfmove;
-        sideToMove ^= 1;
+        sideToMove = ud.oldSideToMove;
+        //sideToMove ^= 1;
     }
     public boolean isSquareAttacked(int sq, int byColor) {
         long occ = occupancy[2];
@@ -846,14 +847,7 @@ public final class BoardV3 {
         }
         System.out.println();
     }
-    public boolean isMate(int turn) {
-        if (turn == 1) {
-            return isKingAttacked(WHITE);
-        }
-        else {
-            return isKingAttacked(BLACK);
-        }
-    }
+    
     private void updatePhase() {
         int phase = 0;
 
@@ -868,6 +862,14 @@ public final class BoardV3 {
         if (phase > 24) currentPhase = 24;
         currentPhase = (24 - phase) / 24;
         
+    }
+    public boolean isMate(int turn) {
+        if (turn == 1) {
+            return isKingAttacked(WHITE);
+        }
+        else {
+            return isKingAttacked(BLACK);
+        }
     }
     public int evaluate() {
         int position = 0;
@@ -965,12 +967,11 @@ public final class BoardV3 {
     //bit 1 is a1 and array[0]...
     public static void main(String[] args) {
         BoardV3 cb = new BoardV3();
-        cb.setFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
-        
+        cb.setFEN("startpos");
         System.err.println(cb.evaluate());
         System.out.println("Default starting position:");
         System.out.println(cb.toStringBoard());
-        int[] depths = {1,2,3,4};
+        int[] depths = {1,2,3,4,5};
         for (int d : depths) {
             long start = System.nanoTime();
             long nodes = cb.perft(d);
