@@ -5,6 +5,7 @@ print(board)
 
 def main():
     print("Hello, World!")
+    
     for move in board.legal_moves:
         print(move)
     

@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 import chess.BoardV3.Move;
 import chess.BoardV3.UndoData;
@@ -126,13 +127,14 @@ public class MiniMaxV5 {
         BoardV3 board = new BoardV3();
         board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44");
         
-        
+        Scanner scanner = new Scanner(System.in);
         while(true) {  
-            board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44"); 
+            String t = scanner.nextLine();
+            board.setFEN(t);
+            //board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44"); 
             long start = System.currentTimeMillis();
-            System.err.println(iterate(1000, board));
+            System.err.println(iterate(10000, board));
             System.err.println("Found move in " + (System.currentTimeMillis() - start));
-            System.exit(0);
             
         }
     }

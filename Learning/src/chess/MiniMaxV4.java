@@ -7,12 +7,13 @@ import chess.BoardV3.Move;
 import chess.BoardV3.UndoData;
 
 public class MiniMaxV4 {
+    static final MoveComparator comparator = new MoveComparator();
     public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta) {
         if (depth == 0) {
             return board.evaluate();
         }
         List<Move> moves = board.generateLegalMoves();
-        Collections.sort(moves, new MoveComparator());
+        Collections.sort(moves, comparator);
 
         if (moves.isEmpty()) {
             if (board.isMate(turn)) {
@@ -32,7 +33,7 @@ public class MiniMaxV4 {
                 
                 board.unmakeMove(move, undo);
                 if (beta <= alpha) {
-                    break; // prune
+                    break; 
                 }
             }
             return eval;
@@ -46,7 +47,7 @@ public class MiniMaxV4 {
                 
                 board.unmakeMove(move, undo);
                 if (beta <= alpha) {
-                    break; // prune
+                    break; 
                 }
             }
             return eval;
@@ -56,7 +57,7 @@ public class MiniMaxV4 {
     }
     public static Move findBestMove(int turn, BoardV3 board, int depth) {
         List<Move> moves = board.generateLegalMoves();
-        Collections.sort(moves, new MoveComparator());
+        Collections.sort(moves, comparator);
         Move bestMove = null;
 
         if (turn == 1) {
@@ -98,10 +99,9 @@ public class MiniMaxV4 {
         board.setFEN("startpos");
         while(true) {  
             //String t = scanner.nextLine();
-            board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44"); 
+            board.setFEN("5Q2/8/8/8/8/8/k1N4/2K4 w - - 0 1"); 
             long start = System.currentTimeMillis();
-            System.err.println(findBestMove(1, board, 7));
-            board.sideToMove = 0;
+            System.err.println(findBestMove(1, board, 6));
             System.err.println("Found move in " + (System.currentTimeMillis() - start));
             //4179
             //r1b3k1/pp3pp1/4p2p/3r4/3B1Q2/2Pq1P2/PP4PP/R3K2R w KQ - 3 20

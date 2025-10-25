@@ -1,12 +1,27 @@
 package chess;
 
+import java.util.Scanner;
+
+import chess.BoardV3.Move;
+
 public class GamePlayer {
     public static void main(String[] args) {
         
 
         BoardV3 board = new BoardV3();
-        MiniMaxV4.findBestMove(1, board, 5);
-        
+        Scanner scanner = new Scanner(System.in);
+        while(board.generateLegalMoves().size() != 0) {
+            //scanner.next();
+            Move bestMove = MiniMaxV4.findBestMove(1, board, 5);
+            board.makeMove(bestMove);
+
+            bestMove = MiniMaxV5.iterate(5000, board);
+            board.makeMove(bestMove);
+            System.err.println(board.evaluate());
+            System.err.println(board.toStringBoard());
+        }
+
+        scanner.close();
     }
 }
 /*
