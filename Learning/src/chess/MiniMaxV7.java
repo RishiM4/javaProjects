@@ -7,7 +7,20 @@ import java.util.Scanner;
 import chess.BoardV3.Move;
 import chess.BoardV3.UndoData;
 
-public class MiniMaxV6 {
+public class MiniMaxV7 {
+    public static int quiescence(int turn, BoardV3 board, int depth, int alpha, int beta, int allotedTime) {
+        List<Move> moves = board.generateLegalMoves();
+        boolean hasCapture = false;
+        for (Move move : moves) {
+            if (move.isCapture) {
+                hasCapture = true;
+            }
+        }
+        if (!hasCapture) {
+            return board.evaluate();
+        }
+        return 0;
+    }
     public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta, long allottedTime) {
         if (depth == 0) {
             return board.evaluate();
@@ -131,7 +144,6 @@ public class MiniMaxV6 {
         while(true) {  
             String t = scanner.nextLine();
             board.setFEN(t);
-            board.sideToMove = 0;
             //board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44"); 
             long start = System.currentTimeMillis();
             System.err.println(iterate(10000, board));

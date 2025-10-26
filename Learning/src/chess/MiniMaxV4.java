@@ -1,19 +1,16 @@
 package chess;
 
-import java.util.Collections;
 import java.util.List;
 
 import chess.BoardV3.Move;
 import chess.BoardV3.UndoData;
 
 public class MiniMaxV4 {
-    static final MoveComparator comparator = new MoveComparator();
     public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta) {
         if (depth == 0) {
             return board.evaluate();
         }
         List<Move> moves = board.generateLegalMoves();
-        Collections.sort(moves, comparator);
 
         if (moves.isEmpty()) {
             if (board.isMate(turn)) {
@@ -57,7 +54,6 @@ public class MiniMaxV4 {
     }
     public static Move findBestMove(int turn, BoardV3 board, int depth) {
         List<Move> moves = board.generateLegalMoves();
-        Collections.sort(moves, comparator);
         Move bestMove = null;
 
         if (turn == 1) {

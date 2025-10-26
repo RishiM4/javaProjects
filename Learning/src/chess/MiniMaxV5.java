@@ -2,21 +2,18 @@ package chess;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 import chess.BoardV3.Move;
 import chess.BoardV3.UndoData;
 
 public class MiniMaxV5 {
-    public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta, long allottedTime) {
+    static final MoveComparator comparator = new MoveComparator();
+    public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta) {
         if (depth == 0) {
             return board.evaluate();
         }
-        if (allottedTime < System.currentTimeMillis()) {
-            throw new RuntimeException();
-        }
         List<Move> moves = board.generateLegalMoves();
-        Collections.sort(moves, new MoveComparator());
+        Collections.sort(moves, comparator);
 
         if (moves.isEmpty()) {
             if (board.isMate(turn)) {
@@ -31,12 +28,12 @@ public class MiniMaxV5 {
             
             for(Move move : moves) {
                 UndoData undo = board.makeMove(move);
-                eval = Math.max(eval, miniMax(turn * -1, board, depth - 1, alpha, beta, allottedTime));
+                eval = Math.max(eval, miniMax(turn * -1, board, depth - 1, alpha, beta));
                 alpha = Math.max(alpha, eval);
                 
                 board.unmakeMove(move, undo);
                 if (beta <= alpha) {
-                    break; // prune
+                    break; 
                 }
             }
             return eval;
@@ -45,12 +42,12 @@ public class MiniMaxV5 {
             int eval = Integer.MAX_VALUE;
             for(Move move : moves) {
                 UndoData undo = board.makeMove(move);
-                eval = Math.min(eval, miniMax(turn * -1, board, depth - 1, alpha, beta, allottedTime));
+                eval = Math.min(eval, miniMax(turn * -1, board, depth - 1, alpha, beta));
                 beta = Math.min(beta, eval);
                 
                 board.unmakeMove(move, undo);
                 if (beta <= alpha) {
-                    break; // prune
+                    break; 
                 }
             }
             return eval;
@@ -58,7 +55,9 @@ public class MiniMaxV5 {
 
 
     }
-    public static Move findBestMove(int turn, BoardV3 board, int depth, List<Move> moves, long allottedTime) {
+    public static Move findBestMove(int turn, BoardV3 board, int depth) {
+        List<Move> moves = board.generateLegalMoves();
+        Collections.sort(moves, comparator);
         Move bestMove = null;
 
         if (turn == 1) {
@@ -68,7 +67,7 @@ public class MiniMaxV5 {
                 if (board.generateLegalMoves().isEmpty() && board.isMate(turn * -1)) {
                     return move;
                 }
-                int currentEval = miniMax(-turn, board, depth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE, allottedTime);
+                int currentEval = miniMax(-turn, board, depth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
                 board.unmakeMove(move, undo);
 
                 if (currentEval > eval) {
@@ -80,7 +79,7 @@ public class MiniMaxV5 {
             int eval = Integer.MAX_VALUE;
             for (Move move : moves) {
                 UndoData undo = board.makeMove(move);
-                int currentEval = miniMax(-turn, board, depth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE, allottedTime);
+                int currentEval = miniMax(-turn, board, depth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
                 board.unmakeMove(move, undo);
                 if (board.generateLegalMoves().isEmpty() && board.isMate(turn * -1)) {
                     return move;
@@ -94,48 +93,20 @@ public class MiniMaxV5 {
         }
         return bestMove;
     }
-    public static Move iterate(int time, BoardV3 board) {
-        long start = System.currentTimeMillis();
-        Move bestMove = null;
-        int depth = 1;
-        List<Move> moves = board.generateLegalMoves();
-        while (time > (System.currentTimeMillis() - start)) {
-            try {
-                Move newMove = findBestMove(1, board, depth, moves, time + System.currentTimeMillis());
-                if (newMove != bestMove) {
-                    bestMove = newMove;
-                    if (moves.contains(bestMove)) {
-                        moves.get(moves.indexOf(bestMove)).weight = depth;
-                        Collections.sort(moves, new MoveComparatorV2());
-                    }
-                }
-            
-                depth++;
-            } catch (Exception e) {
-                break;
-            }
-            
-        }
-        if (bestMove == null) {
-            return findBestMove(1, board, depth, moves, 1000);
-        }
-        System.err.println("Reached depth of: "+ depth);
-        return bestMove;
-    }
 
     public static void main(String[] args) {
         BoardV3 board = new BoardV3();
-        board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44");
-        
-        Scanner scanner = new Scanner(System.in);
+        board.setFEN("startpos");
         while(true) {  
-            String t = scanner.nextLine();
-            board.setFEN(t);
-            //board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44"); 
+            //String t = scanner.nextLine();
+            board.setFEN("5Q2/8/8/8/8/8/k1N4/2K4 w - - 0 1"); 
             long start = System.currentTimeMillis();
-            System.err.println(iterate(10000, board));
+            System.err.println(findBestMove(1, board, 6));
             System.err.println("Found move in " + (System.currentTimeMillis() - start));
-            
+            //4179
+            //r1b3k1/pp3pp1/4p2p/3r4/3B1Q2/2Pq1P2/PP4PP/R3K2R w KQ - 3 20
+            //51073
+            System.exit(0);
         }
     }
 }
