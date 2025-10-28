@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -8,25 +9,68 @@ import chess.BoardV3.Move;
 import chess.BoardV3.UndoData;
 
 public class MiniMaxV7 {
-    public static int quiescence(int turn, BoardV3 board, int depth, int alpha, int beta, int allotedTime) {
-        List<Move> moves = board.generateLegalMoves();
-        boolean hasCapture = false;
-        for (Move move : moves) {
-            if (move.isCapture) {
-                hasCapture = true;
+    public static int nodes = 0;
+    public static int quiescence(int turn, BoardV3 board, int depth, int alpha, int beta, long allottedTime) throws Exception{
+        nodes++;
+        
+        List<Move> moves = new ArrayList<>();
+        board.generatePseudoLegalAttacks(moves);
+        Collections.sort(moves, new MoveComparator());
+        int standPat = board.evaluate();
+        if (standPat >= beta) {
+            return beta;
+        }
+        if (standPat > alpha) {
+            alpha = standPat;
+        }
+        if (moves.isEmpty()) {
+            return standPat;
+        }
+        if ((nodes & 0x3FF) == 0) { // 0x3FF = 1023
+            if (System.currentTimeMillis() > allottedTime) {
+                throw new Exception("Time's up");
             }
         }
-        if (!hasCapture) {
-            return board.evaluate();
+        if (depth > 5) {
+            return standPat;
         }
-        return 0;
+        if (turn == 1) {
+            int eval = Integer.MIN_VALUE;
+            for (Move move : moves) {
+                UndoData undoData = board.makeMove(move);
+                eval = Math.max(eval, quiescence(turn * -1, board, depth + 1, alpha, beta, allottedTime));
+                alpha = Math.max(eval, alpha);
+                board.unmakeMove(move, undoData);
+                if (beta <= alpha) {
+                    break; // prune
+                }
+            }
+            return eval;
+        }
+        else {
+            int eval = Integer.MAX_VALUE;
+            for (Move move : moves) {
+                UndoData undoData = board.makeMove(move);
+                eval = Math.min(eval, quiescence(turn * -1, board, depth + 1, alpha, beta, allottedTime));
+                beta = Math.min(eval, beta);
+                board.unmakeMove(move, undoData);
+                if (beta <= alpha) {
+                    break; // prune
+                }
+            }
+            return eval;
+        }
+       
     }
-    public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta, long allottedTime) {
+    public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta, long allottedTime) throws Exception{
+        nodes++;
         if (depth == 0) {
-            return board.evaluate();
+            return quiescence(turn, board, 1, alpha, beta, allottedTime);
         }
-        if (allottedTime < System.currentTimeMillis()) {
-            throw new RuntimeException();
+        if ((nodes & 0x3FF) == 0) { // 0x3FF = 1023
+            if (System.currentTimeMillis() > allottedTime) {
+                throw new Exception("Time's up");
+            }
         }
         List<Move> moves = board.generateLegalMoves();
         Collections.sort(moves, new MoveComparator());
@@ -71,7 +115,8 @@ public class MiniMaxV7 {
 
 
     }
-    public static Move findBestMove(int turn, BoardV3 board, int depth, List<Move> moves, long allottedTime) {
+    public static Move findBestMove(int turn, BoardV3 board, int depth, List<Move> moves, long allottedTime) throws Exception{
+        nodes++;
         Move bestMove = null;
 
         if (turn == 1) {
@@ -108,6 +153,7 @@ public class MiniMaxV7 {
         return bestMove;
     }
     public static Move iterate(int time, BoardV3 board) {
+        nodes++;
         long start = System.currentTimeMillis();
         Move bestMove = null;
         int depth = 1;
@@ -125,14 +171,16 @@ public class MiniMaxV7 {
             
                 depth++;
             } catch (Exception e) {
+                //e.printStackTrace();
                 break;
             }
             
         }
         if (bestMove == null) {
-            return findBestMove(1, board, depth, moves, 1000);
+            //return findBestMove(1, board, depth, moves, 1000);
         }
         System.err.println("Reached depth of: "+ depth);
+        System.err.println("Traversed %s nodes".formatted(nodes));
         return bestMove;
     }
 

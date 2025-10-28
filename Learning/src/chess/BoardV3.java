@@ -470,6 +470,7 @@ public final class BoardV3 {
         public final boolean isCapture;
         public final boolean isEnPassant;
         public final boolean isCastle;
+        public int capture = -1;
         public int weight = 0;
         public Move(int from, int to, int piece, int promotion, boolean isCapture, boolean isEnPassant, boolean isCastle) {
             this.from = from; this.to = to; this.piece = piece; this.promotion = promotion; this.isCapture = isCapture; this.isEnPassant = isEnPassant; this.isCastle = isCastle;
@@ -495,6 +496,109 @@ public final class BoardV3 {
             if (!ok) it.remove();
         }
         return moves;
+    }
+    
+    public void generatePseudoLegalAttacks(List<Move> out) {
+        int us = sideToMove;
+        int them = us ^ 1;
+        long occ = occupancy[2];
+
+        // --- PAWNS (captures only) ---
+        long pawns = pieceBB[us * 6 + PAWN];
+        while (pawns != 0) {
+            int from = Long.numberOfTrailingZeros(pawns);
+            pawns &= pawns - 1;
+
+            long attacks;
+            if (us == WHITE) {
+                attacks = WHITE_PAWN_ATTACKS[from] & occupancy[them];
+            } else {
+                attacks = BLACK_PAWN_ATTACKS[from] & occupancy[them];
+            }
+
+            // normal captures (including promotions)
+            while (attacks != 0) {
+                int to = Long.numberOfTrailingZeros(attacks);
+                attacks &= attacks - 1;
+                boolean promotion = (us == WHITE && to >= 56) || (us == BLACK && to < 8);
+                if (promotion) {
+                    out.add(new Move(from, to, PAWN, QUEEN, true, false, false));
+                    out.add(new Move(from, to, PAWN, ROOK, true, false, false));
+                    out.add(new Move(from, to, PAWN, BISHOP, true, false, false));
+                    out.add(new Move(from, to, PAWN, KNIGHT, true, false, false));
+                } else {
+                    out.add(new Move(from, to, PAWN, -1, true, false, false));
+                }
+            }
+
+            // optional en passant capture
+            if (enPassantSquare != -1) {
+                long epMask = 1L << enPassantSquare;
+                if ((us == WHITE && (WHITE_PAWN_ATTACKS[from] & epMask) != 0) ||
+                    (us == BLACK && (BLACK_PAWN_ATTACKS[from] & epMask) != 0)) {
+                    out.add(new Move(from, enPassantSquare, PAWN, -1, true, true, false));
+                }
+            }
+        }
+
+        // --- KNIGHTS ---
+        long knights = pieceBB[us * 6 + KNIGHT];
+        while (knights != 0) {
+            int from = Long.numberOfTrailingZeros(knights);
+            knights &= knights - 1;
+            long targets = KNIGHT_ATTACKS[from] & occupancy[them];
+            while (targets != 0) {
+                int to = Long.numberOfTrailingZeros(targets);
+                targets &= targets - 1;
+                out.add(new Move(from, to, KNIGHT, -1, true, false, false));
+            }
+        }
+
+        // --- BISHOPS ---
+        long bishops = pieceBB[us * 6 + BISHOP];
+        while (bishops != 0) {
+            int from = Long.numberOfTrailingZeros(bishops);
+            bishops &= bishops - 1;
+            long attacks = bishopAttacks(from, occ) & occupancy[them];
+            addSlidingCaptures(out, from, attacks, BISHOP);
+        }
+
+        // --- ROOKS ---
+        long rooks = pieceBB[us * 6 + ROOK];
+        while (rooks != 0) {
+            int from = Long.numberOfTrailingZeros(rooks);
+            rooks &= rooks - 1;
+            long attacks = rookAttacks(from, occ) & occupancy[them];
+            addSlidingCaptures(out, from, attacks, ROOK);
+        }
+
+        // --- QUEENS ---
+        long queens = pieceBB[us * 6 + QUEEN];
+        while (queens != 0) {
+            int from = Long.numberOfTrailingZeros(queens);
+            queens &= queens - 1;
+            long attacks = queenAttacks(from, occ) & occupancy[them];
+            addSlidingCaptures(out, from, attacks, QUEEN);
+        }
+
+        // --- KING (no castling, captures only) ---
+        long kings = pieceBB[us * 6 + KING];
+        if (kings != 0) {
+            int from = Long.numberOfTrailingZeros(kings);
+            long targets = KING_ATTACKS[from] & occupancy[them];
+            while (targets != 0) {
+                int to = Long.numberOfTrailingZeros(targets);
+                targets &= targets - 1;
+                out.add(new Move(from, to, KING, -1, true, false, false));
+            }
+        }
+    }
+    private void addSlidingCaptures(List<Move> out, int from, long attacks, int pieceType) {
+        while (attacks != 0) {
+            int to = Long.numberOfTrailingZeros(attacks);
+            attacks &= attacks - 1;
+            out.add(new Move(from, to, pieceType, -1, true, false, false));
+        }
     }
     private void generatePseudoLegalMoves(List<Move> out) {
         int us = sideToMove;

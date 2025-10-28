@@ -12,10 +12,10 @@ public class GamePlayer {
         Scanner scanner = new Scanner(System.in);
         while(board.generateLegalMoves().size() != 0) {
             //scanner.next();
-            Move bestMove = MiniMaxV4.findBestMove(1, board, 5);
+            Move bestMove = MiniMaxV5.findBestMove(1, board, 5);
             board.makeMove(bestMove);
 
-            bestMove = MiniMaxV5.iterate(5000, board);
+            bestMove = MiniMaxV6.iterate(5000, board);
             board.makeMove(bestMove);
             System.err.println(board.evaluate());
             System.err.println(board.toStringBoard());

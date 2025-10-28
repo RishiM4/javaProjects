@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "KeyBoard",
+            "request": "launch",
+            "mainClass": "com.KeyBoard",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "MiniMaxV6",
+            "request": "launch",
+            "mainClass": "chess.MiniMaxV6",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "MiniMaxV7",
+            "request": "launch",
+            "mainClass": "chess.MiniMaxV7",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "GamePlayer",
             "request": "launch",
             "mainClass": "chess.GamePlayer",
