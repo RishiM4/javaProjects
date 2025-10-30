@@ -15,7 +15,7 @@ public class GamePlayer {
             Move bestMove = MiniMaxV5.findBestMove(1, board, 5);
             board.makeMove(bestMove);
 
-            bestMove = MiniMaxV6.iterate(5000, board);
+            bestMove = MiniMaxV6.iterate(1,5000, board);
             board.makeMove(bestMove);
             System.err.println(board.evaluate());
             System.err.println(board.toStringBoard());

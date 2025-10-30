@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MiniMaxServer",
+            "request": "launch",
+            "mainClass": "chess.MiniMaxServer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "KeyBoard",
             "request": "launch",
             "mainClass": "com.KeyBoard",

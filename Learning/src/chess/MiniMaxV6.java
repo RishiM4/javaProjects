@@ -94,14 +94,14 @@ public class MiniMaxV6 {
         }
         return bestMove;
     }
-    public static Move iterate(int time, BoardV3 board) {
+    public static Move iterate(int turn, int time, BoardV3 board) {
         long start = System.currentTimeMillis();
         Move bestMove = null;
         int depth = 1;
         List<Move> moves = board.generateLegalMoves();
         while (time > (System.currentTimeMillis() - start)) {
             try {
-                Move newMove = findBestMove(1, board, depth, moves, time + System.currentTimeMillis());
+                Move newMove = findBestMove(turn, board, depth, moves, time + System.currentTimeMillis());
                 if (newMove != bestMove) {
                     bestMove = newMove;
                     if (moves.contains(bestMove)) {
@@ -134,7 +134,7 @@ public class MiniMaxV6 {
             board.sideToMove = 0;
             //board.setFEN("1n2r3/5pk1/1Rp3p1/p1Np1P2/8/P1P4p/1P6/1K2r3 b - - 0 44"); 
             long start = System.currentTimeMillis();
-            System.err.println(iterate(10000, board));
+            System.err.println(iterate(1,10000, board));
             System.err.println("Found move in " + (System.currentTimeMillis() - start));
             
         }

@@ -1,8 +1,10 @@
 import pygame
 import sys
+import socket
 import chess 
 pygame.init()
-board = chess.Board("rnbqkbnr/pppp1ppp/8/4p3/3P4/8/PPP2PPP/RNBQKBNR w KQkq e6 0 3")
+board = chess.Board()
+
 WIDTH, HEIGHT = 900, 700   
 ROWS, COLS = 8, 8          
 SQUARE_SIZE = 75
@@ -21,9 +23,28 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Chess | By Rishi & Advik")
 currentPiece = None
 currentCell = None
+moveCells = []
 running = True
 captures = []
+moves = []
 while running:
+    if(board.turn == chess.BLACK) :
+        print("Sending request")
+        with socket.create_connection(("localhost", 6000)) as s:
+            message = f"fen:{board.fen()}\n"
+            s.sendall(message.encode())
+            s.sendall(b"go depth 4\n")
+
+            data = s.recv(1024).decode().strip()
+            print("Java replied:", data)
+            from_square, to_square = map(int, data.split(","))
+            move = chess.Move(from_square, to_square)
+            moveCells = []
+            moveCells.append(from_square)
+            moveCells.append(to_square)
+            board.push(move)
+    #text_surface = font.render(board, True, (255, 255, 255))
+           
     screen.fill(GRAY)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -40,13 +61,31 @@ while running:
                     if currentPiece == "None" :
                         currentCell = None
                     for move in board.generate_legal_captures() :
-                        if board.is_capture(move) :
+                        if board.is_capture(move) and move.from_square == (row) * 8+ col:
                             captures.append(move.to_square)
+                    for move in board.generate_legal_moves() :
+                        if not board.is_capture(move) and move.from_square == row * 8 + col:
+                            moves.append(move.to_square)
                     
         elif event.type == pygame.MOUSEBUTTONUP:
+            x, y = event.pos
             if event.button == 1: 
+                if (x > 50 and x < 650) and (y > 50 and y < 650) :
+                    col = (x - 50) // 75
+                    row = (y - 50) // 75
+                    row = 7 - row
+                    cell = row*8 + col
+                    if (cell in moves or cell in captures) :
+                        print("MAKE MOVE")
+                        moveCells = []
+                        moveCells.append(currentCell)
+                        moveCells.append(cell)
+                        move = chess.Move(currentCell, cell)
+                        board.push(move)
                 currentPiece = None
                 currentCell = None
+                captures = []
+                moves = []
 
     for row in range(ROWS):
         for col in range(COLS):
@@ -55,6 +94,10 @@ while running:
             if (row + col) % 2 != 0 :
                 color = GREEN
             piece = str(board.piece_at(((7-row)*8)+col))
+            if(cell in moveCells and color == WHITE) :
+                color = HIGHLIGHT_WHITE
+            elif (cell in moveCells and color == GREEN) :
+                color = HIGHLIGHT_GREEN
             if(cell == currentCell and color == WHITE) :
                 color = HIGHLIGHT_WHITE
                 surface = pygame.Surface((75, 75), pygame.SRCALPHA)
@@ -96,16 +139,25 @@ while running:
             scaled_img = pygame.transform.smoothscale(surface, (75, 75))
             pygame.draw.rect(screen, color, rect)
             screen.blit(scaled_img, (col*SQUARE_SIZE + offset, row*SQUARE_SIZE + offset))
+    for row in range(ROWS) :
+        for col in range(COLS) :
+            cell = (7-row) * 8 + col
             if cell in captures :
 
                 ring_surface = pygame.Surface((75, 75), pygame.SRCALPHA)
 
                 center = ((75 // 2), (75 // 2))
                 radius = 75 // 2 - 6
-
+                pos = (((col)*75) + offset,((row) * 75) + offset)
                 pygame.draw.circle(ring_surface, (0, 0, 0, 120), center, radius, 6)
-
-                screen.blit(ring_surface, (4 * 75 + offset, 4 * 75 + offset))
+                screen.blit(ring_surface, pos)
+            elif cell in moves :
+                dot_surface = pygame.Surface((75, 75), pygame.SRCALPHA)
+                center = (75 // 2, 75 // 2)
+                radius = 75 // 8  # adjust size if you want smaller/bigger dot
+                pygame.draw.circle(dot_surface, (0,0,0,120), center, radius)
+                screen.blit(dot_surface, (col * 75 + offset, row * 75 + offset))
+              
 
     if currentPiece != None :
         if currentPiece == 'k' :
@@ -138,7 +190,6 @@ while running:
         x, y = pygame.mouse.get_pos()
         screen.blit(piece, piece.get_rect(center=(x, y)))
 
-    
         
     pygame.display.flip()
 
