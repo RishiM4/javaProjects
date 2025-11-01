@@ -1,4 +1,4 @@
-package chessV2;
+package src.chessV2;
 
 import java.util.*;
 

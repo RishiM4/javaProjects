@@ -1,6 +1,6 @@
-package car;
+package src.car;
 
-import car.parts.Wheel;
+import src.car.parts.Wheel;
 
 
 

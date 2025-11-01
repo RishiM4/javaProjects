@@ -1,4 +1,4 @@
-package car.parts;
+package src.car.parts;
 
 public class GasEngine extends Engine{
     public GasEngine (String fuelType, int peakRPM, int cylinders, int horsepower, double capacity) {

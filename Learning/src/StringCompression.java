@@ -1,3 +1,4 @@
+package src;
 /*pg 91 
 Implement a method to perform basic string compression using counts of repeated characters. If the compressed string is longer than the 
 uncompressed string, return the uncompressed string. Assume that the string has only uppercase and lowercase letters from a-z

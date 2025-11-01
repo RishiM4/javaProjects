@@ -1,7 +1,7 @@
-package car.parts;
+package src.car.parts;
 import java.io.Serializable;
 
-import car.IllegalFuelTypeException;
+import src.car.IllegalFuelTypeException;
 
 
 /**

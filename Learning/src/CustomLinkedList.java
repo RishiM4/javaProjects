@@ -1,3 +1,5 @@
+package src;
+
 public class CustomLinkedList<T> {
     private Node<T> startNode;
 
@@ -87,6 +89,17 @@ public class CustomLinkedList<T> {
     }
     public static void main(String[] args) {
         
+        CustomLinkedList<Integer> list = new CustomLinkedList<>();
+        list.insert(0, 1);
+        list.insert(0, 2);
+        list.insert(0, 3);
+        list.insert(0, 4);
+        list.printList();
+
+        Node<Integer> node = list.startNode;
+        while (node != null) {
+            node = node.nextNode;
+        }
 
     }
 }

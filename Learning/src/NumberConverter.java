@@ -1,3 +1,5 @@
+package src;
+
 public class NumberConverter {
     public void convert(int input, int base) {
         int results[] = new int[(int)(Math.log(input)/Math.log(base))+1];

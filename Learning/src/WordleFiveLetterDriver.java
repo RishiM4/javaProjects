@@ -1,3 +1,4 @@
+package src;
 
 public class WordleFiveLetterDriver {
     WordleFiveLetter wordle = new WordleFiveLetter();

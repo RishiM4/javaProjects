@@ -1,4 +1,4 @@
-package car.parts;
+package src.car.parts;
 
 abstract class Engine {
     protected Engine (String fuelType, int peakRPM) {

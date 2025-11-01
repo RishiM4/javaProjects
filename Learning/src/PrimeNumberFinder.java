@@ -1,3 +1,5 @@
+package src;
+
 
 import java.util.TimerTask;
 import java.util.ArrayList;
@@ -82,7 +84,7 @@ public class PrimeNumberFinder {
                 System.exit(0);
             }
         };
-        timer.schedule(task, 30000);
+        timer.schedule(task, 5000);
         calandar = Calendar.getInstance();
         startTime = calandar.getTimeInMillis();
         while (timerActive) {

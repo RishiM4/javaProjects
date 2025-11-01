@@ -1,11 +1,11 @@
-package chess;
+package src.chess;
 
 import java.util.Comparator;
 
-public class MoveComparator implements Comparator<chess.BoardV3.Move>{
+public class MoveComparator implements Comparator<src.chess.BoardV3.Move>{
 
     @Override
-    public int compare(chess.BoardV3.Move o1, chess.BoardV3.Move o2) {
+    public int compare(src.chess.BoardV3.Move o1, src.chess.BoardV3.Move o2) {
         //less than negative, equal 0, greater than positive
         if (o1.isCapture && !o2.isCapture) {
             return -1;

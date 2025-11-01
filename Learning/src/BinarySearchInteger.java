@@ -1,3 +1,5 @@
+package src;
+
 public class BinarySearchInteger {
     private static Integer search(Integer[] arr, int target) {
         return search(arr, target, 0, arr.length-1,1);

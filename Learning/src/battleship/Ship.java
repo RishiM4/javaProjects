@@ -1,4 +1,4 @@
-package battleship;
+package src.battleship;
 
 public class Ship {
     int length;

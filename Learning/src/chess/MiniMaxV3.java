@@ -1,4 +1,4 @@
-package chess;
+package src.chess;
 
 public class MiniMaxV3 {
 

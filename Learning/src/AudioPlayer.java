@@ -1,3 +1,5 @@
+package src;
+
 import javax.sound.sampled.*;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;

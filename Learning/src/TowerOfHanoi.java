@@ -1,3 +1,4 @@
+package src;
 public class TowerOfHanoi {
     static int num = 0;
     private static CustomStack<Integer> solve(int numOfDiscs) {

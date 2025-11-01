@@ -1,3 +1,5 @@
+package src;
+
 public class Bit {
     private int state = 0;
     public Bit(int s) {

@@ -1,4 +1,4 @@
-package chess;
+package src.chess;
 
 public class MoveV2 {
     public static int encode(int from, int to, int capture, boolean promotion, boolean enpassant, boolean whiteKingsideCastlingRights, boolean whiteQueensideCastlingRights, boolean blackKingsideCastlingRights, boolean blackQueensideCastlingRights, boolean castling) {

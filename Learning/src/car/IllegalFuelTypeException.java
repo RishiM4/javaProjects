@@ -1,4 +1,4 @@
-package car;
+package src.car;
 
 public class IllegalFuelTypeException extends RuntimeException{
     public IllegalFuelTypeException() {

@@ -1,4 +1,4 @@
-package car.parts;
+package src.car.parts;
 
 public class Wheel {
     private int wheelDiameter;

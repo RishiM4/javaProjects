@@ -1,3 +1,5 @@
+package src;
+
 public class BubbleSort {
     private static int[] sortDigit(int character, int[] input) {
         

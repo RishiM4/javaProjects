@@ -1,11 +1,11 @@
-package chess;
+package src.chess;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-import chess.BoardV3.Move;
-import chess.BoardV3.UndoData;
+import src.chess.BoardV3.Move;
+import src.chess.BoardV3.UndoData;
 
 public class MiniMaxV6 {
     public static int miniMax(int turn, BoardV3 board, int depth, int alpha, int beta, long allottedTime) {

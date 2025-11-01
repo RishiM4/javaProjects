@@ -1,4 +1,4 @@
-package car.parts;
+package src.car.parts;
 
 public enum FuelType {
     ELECTRIC ("Electric"),

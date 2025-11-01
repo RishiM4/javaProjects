@@ -1,10 +1,10 @@
-package chess;
+package src.chess;
 
 import java.util.Collections;
 import java.util.List;
 
-import chess.BoardV3.Move;
-import chess.BoardV3.UndoData;
+import src.chess.BoardV3.Move;
+import src.chess.BoardV3.UndoData;
 
 public class MiniMaxV5 {
     static final MoveComparator comparator = new MoveComparator();

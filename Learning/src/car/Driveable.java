@@ -1,4 +1,4 @@
-package car;
+package src.car;
 
 public interface Driveable {
     void drive();

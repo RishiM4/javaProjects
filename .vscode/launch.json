@@ -6,6 +6,99 @@
     "configurations": [
         {
             "type": "java",
+            "name": "StockFetcher",
+            "request": "launch",
+            "mainClass": "src.StockFetcher",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "AudioPlayer",
+            "request": "launch",
+            "mainClass": "src.AudioPlayer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "AnagramDetector",
+            "request": "launch",
+            "mainClass": "src.AnagramDetector",
+            "projectName": "javaProjects_a422883c"
+        },
+      {
+      "type": "java",
+      "name": "Auto Run (Smart)",
+      "request": "launch",
+      "mainClass": "${file}",
+      "vmArgs": "--module-path \"C:/Users/Rishi (New)/javaProjects/javafx-sdk-25.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
+    },
+
+
+        {
+            "type": "java",
+            "name": "WordleFiveLetterDriver",
+            "request": "launch",
+            "mainClass": "WordleFiveLetterDriver",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "WordleFiveLetter",
+            "request": "launch",
+            "mainClass": "WordleFiveLetter",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "StockFetcher",
+            "request": "launch",
+            "mainClass": "StockFetcher",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "JavaFXTest",
+            "request": "launch",
+            "mainClass": "com.JavaFXTest",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "StockFetcher",
+            "request": "launch",
+            "mainClass": "StockFetcher",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "StockTest",
+            "request": "launch",
+            "mainClass": "com.StockTest",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.Main",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "CustomLinkedList",
+            "request": "launch",
+            "mainClass": "CustomLinkedList",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "MiniMaxServer",
             "request": "launch",
             "mainClass": "chess.MiniMaxServer",
@@ -549,5 +642,11 @@
             "mainClass": "test",
             "projectName": "javaProjects_a422883c"
         }
+    ],
+    "compounds": [
+    {
+      "name": "Auto: Smart Run",
+      "configurations": []
+    }
     ]
 }

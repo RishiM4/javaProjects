@@ -1,8 +1,8 @@
-package chess;
+package src.chess;
 
 import java.util.Scanner;
 
-import chess.BoardV3.Move;
+import src.chess.BoardV3.Move;
 
 public class GamePlayer {
     public static void main(String[] args) {

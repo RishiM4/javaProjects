@@ -1,8 +1,8 @@
-package chess;
+package src.chess;
 
 import java.io.*;
 import java.net.*;
-import chess.BoardV3.Move;
+import src.chess.BoardV3.Move;
 public class MiniMaxServer {
     public static void main(String[] args) throws IOException{
         int port = 6000;

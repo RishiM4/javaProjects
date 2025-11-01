@@ -1,4 +1,4 @@
-package chess;
+package src.chess;
 
 import java.util.*;
 
@@ -1075,7 +1075,7 @@ public final class BoardV3 {
         System.err.println(cb.evaluate());
         System.out.println("Default starting position:");
         System.out.println(cb.toStringBoard());
-        int[] depths = {1,2,3,4,5,8};
+        int[] depths = {1,2,3,4,5};
         for (int d : depths) {
             long start = System.nanoTime();
             long nodes = cb.perft(d);

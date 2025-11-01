@@ -1,11 +1,11 @@
-package chess;
+package src.chess;
 
 import java.util.Comparator;
 
-public class MoveComparatorV2 implements Comparator<chess.BoardV3.Move>{
+public class MoveComparatorV2 implements Comparator<src.chess.BoardV3.Move>{
 
     @Override
-    public int compare(chess.BoardV3.Move o1, chess.BoardV3.Move o2) {
+    public int compare(src.chess.BoardV3.Move o1, src.chess.BoardV3.Move o2) {
         if (o2.weight > o1.weight) {
             return 1;
         }

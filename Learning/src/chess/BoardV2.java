@@ -1,4 +1,4 @@
-package chess;
+package src.chess;
 
 public class BoardV2 {
     public byte board[];
