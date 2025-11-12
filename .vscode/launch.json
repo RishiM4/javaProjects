@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.App",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "GaGScript",
+            "request": "launch",
+            "mainClass": "src.GaGScript",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "AlphaVantageHistory",
+            "request": "launch",
+            "mainClass": "com.AlphaVantageHistory",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "StockFetcher",
+            "request": "launch",
+            "mainClass": "com.StockFetcher",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
             "name": "StockFetcher",
             "request": "launch",
             "mainClass": "src.StockFetcher",
@@ -25,15 +53,13 @@
             "mainClass": "src.AnagramDetector",
             "projectName": "javaProjects_a422883c"
         },
-      {
-      "type": "java",
-      "name": "Auto Run (Smart)",
-      "request": "launch",
-      "mainClass": "${file}",
-      "vmArgs": "--module-path \"C:/Users/Rishi (New)/javaProjects/javafx-sdk-25.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
-    },
-
-
+        {
+            "type": "java",
+            "name": "Auto Run (Smart)",
+            "request": "launch",
+            "mainClass": "${file}",
+            "vmArgs": "--module-path \"C:/Users/Rishi (New)/javaProjects/javafx-sdk-25.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
+        },
         {
             "type": "java",
             "name": "WordleFiveLetterDriver",

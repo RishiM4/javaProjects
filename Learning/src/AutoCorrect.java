@@ -316,6 +316,7 @@ public class AutoCorrect {
         for(int k = 0; k < finalList.size(); k++){
             System.out.println(finalList.get(k));
         }
+        
         scanner.close();
         System.out.println(finalList);
         
