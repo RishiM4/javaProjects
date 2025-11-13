@@ -1,8 +1,5 @@
 com\stockMarket\StockFetcher.class
-com\Main.class
+com\KeyBoard.class
 com\stockMarket\WebServer.class
 com\KeyBoard$2.class
-com\App.class
-com\KeyBoard.class
-com\JavaFXTest.class
 com\KeyBoard$1.class

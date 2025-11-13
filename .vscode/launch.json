@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MiniMaxServer",
+            "request": "launch",
+            "mainClass": "src.chess.MiniMaxServer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "App",
             "request": "launch",
             "mainClass": "com.App",

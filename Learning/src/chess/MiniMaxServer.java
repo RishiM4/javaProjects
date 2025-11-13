@@ -26,7 +26,7 @@ public class MiniMaxServer {
                         String fen = line.split(":")[1];
                         BoardV3 board = new BoardV3();
                         board.setFEN(fen);
-                        Move move = MiniMaxV6.iterate(-1, 1000, board);
+                        Move move = MiniMaxV6.iterate(-1, 2500, board);
                         output = move.from + "," + move.to;
                     }
 
