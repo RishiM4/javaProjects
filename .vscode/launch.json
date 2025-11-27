@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.urlshortener.App",
+            "projectName": "urlshortener"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.NotesApp.App",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "CallPython",
+            "request": "launch",
+            "mainClass": "com.NotesApp.CallPython",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "ExampleEntryPoint",
+            "request": "launch",
+            "mainClass": "com.NotesApp.ExampleEntryPoint",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
             "name": "MiniMaxServer",
             "request": "launch",
             "mainClass": "src.chess.MiniMaxServer",
