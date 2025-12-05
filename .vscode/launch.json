@@ -6,6 +6,195 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ClearRateLimit",
+            "request": "launch",
+            "mainClass": "com.stock.ClearRateLimit",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "TickerValidator",
+            "request": "launch",
+            "mainClass": "com.stock.TickerValidator",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "Driver",
+            "request": "launch",
+            "mainClass": "com.stock.Driver",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "src.App",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "AlphaVantageTickerValidator",
+            "request": "launch",
+            "mainClass": "com.stock.AlphaVantageTickerValidator",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "AlphaVantageChecker",
+            "request": "launch",
+            "mainClass": "com.stock.AlphaVantageChecker",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "StockSelecter",
+            "request": "launch",
+            "mainClass": "com.stock.StockSelecter",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "HoverDeleteListFixed",
+            "request": "launch",
+            "mainClass": "com.stock.HoverDeleteListFixed",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "HoverDeleteList",
+            "request": "launch",
+            "mainClass": "com.stock.HoverDeleteList",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "TextToListExample",
+            "request": "launch",
+            "mainClass": "com.stock.TextToListExample",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "Display",
+            "request": "launch",
+            "mainClass": "com.stock.Display",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "DataFetcher",
+            "request": "launch",
+            "mainClass": "com.stock.DataFetcher",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "FinnhubKeyMetrics",
+            "request": "launch",
+            "mainClass": "com.stock.FinnhubKeyMetrics",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "FinnhubFundamentalsBuiltin",
+            "request": "launch",
+            "mainClass": "com.stock.FinnhubFundamentalsBuiltin",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "StockFetcher",
+            "request": "launch",
+            "mainClass": "com.stockMarket.StockFetcher",
+            "projectName": "chess"
+        },
+        {
+            "type": "java",
+            "name": "YahooFinanceScraper",
+            "request": "launch",
+            "mainClass": "com.stock.YahooFinanceScraper",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "AlphaVantageDemo",
+            "request": "launch",
+            "mainClass": "com.stock.AlphaVantageDemo",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.stock.Main",
+            "projectName": "demo"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.stockmarket.main.App",
+            "projectName": "stockmarket"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "com.stockmarket.main.Test",
+            "projectName": "stockmarket"
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.stockmarket.App",
+            "projectName": "stockmarket"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "com.stockmarket.Test",
+            "projectName": "stockmarket"
+        },
+        {
+            "type": "java",
+            "name": "AlphaVantageDemo",
+            "request": "launch",
+            "mainClass": "com.stockmarket.AlphaVantageDemo",
+            "projectName": "stockmarket"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "com.urlshortener.main.Test",
+            "projectName": "urlshortener"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.urlshortener.main.Main",
+            "projectName": "urlshortener"
+        },
+        {
+            "type": "java",
+            "name": "UrlshortenerApplication",
+            "request": "launch",
+            "mainClass": "com.urlshortener.main.UrlshortenerApplication",
+            "projectName": "urlshortener"
+        },
+        {
+            "type": "java",
+            "name": "MyappApplication",
+            "request": "launch",
+            "mainClass": "com.urlshortener.main.MyappApplication",
+            "projectName": "urlshortener"
+        },
+        {
+            "type": "java",
             "name": "App",
             "request": "launch",
             "mainClass": "com.urlshortener.App",

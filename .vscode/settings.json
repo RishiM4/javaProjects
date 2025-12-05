@@ -5,7 +5,10 @@
 
     "java.debug.settings.onBuildFailureProceed": true,
     "java.project.sourcePaths": [
-        "Learning"
+      "Stocks/stockmarket/src/main/java/com/stocks",
+      "StockMarket",
+      "Learning",
+      "Stocks/stockmarket"
     ],
   "java.debug.settings.forceBuildBeforeLaunch": true,
   
