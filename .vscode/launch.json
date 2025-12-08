@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Network",
+            "request": "launch",
+            "mainClass": "src.neural_network.Network",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "ClearRateLimit",
             "request": "launch",
             "mainClass": "com.stock.ClearRateLimit",
