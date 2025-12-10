@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MNIST_CSV_Loader",
+            "request": "launch",
+            "mainClass": "src.neural_network.MNIST_CSV_Loader",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "FlowerIrisNetwork",
+            "request": "launch",
+            "mainClass": "src.neural_network.FlowerIrisNetwork",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "TestXOR",
+            "request": "launch",
+            "mainClass": "src.neural_network.TestXOR",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "Network",
             "request": "launch",
             "mainClass": "src.neural_network.Network",
