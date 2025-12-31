@@ -1,4 +1,4 @@
-name: Run Python Periodically
+name: Run Discord Python Script
 
 on:
   schedule:
@@ -8,6 +8,7 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -17,5 +18,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run Python script
+      - name: List files (for debugging)
+        run: ls -R
+
+      - name: Run Discord script
         run: python Learning/src/discord.py
