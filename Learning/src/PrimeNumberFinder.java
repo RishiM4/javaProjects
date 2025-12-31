@@ -42,7 +42,7 @@ public class PrimeNumberFinder {
         Path filePath = Paths.get("primeNumberData.txt");
         try {
 			List<String> lines = new ArrayList<String>();
-            for(int k =0; k < list.size(); k++){
+            for(int k = 0; k < list.size(); k++){
                 lines.add(""+list.get(k));
             }
             Files.write(filePath, lines);

@@ -1,0 +1,21 @@
+name: Run Python Periodically
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes for testing
+  workflow_dispatch:        # allows manual run
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Python script
+        run: python Learning/src/discord.py
