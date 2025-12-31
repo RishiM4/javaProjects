@@ -3,7 +3,7 @@ name: Run Discord Python Script
 on:
   schedule:
     - cron: "*/5 * * * *"   # every 5 minutes for testing
-  workflow_dispatch:        # allows manual run
+  workflow_dispatch:
 
 jobs:
   run-script:
@@ -18,8 +18,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: List files (for debugging)
-        run: ls -R
+      - name: Install dependencies
+        run: pip install requests
 
       - name: Run Discord script
         run: python Learning/src/Discord.py
