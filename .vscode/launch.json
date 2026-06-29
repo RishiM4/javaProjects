@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "src.Test",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "Board",
+            "request": "launch",
+            "mainClass": "src.chessV2.Board",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
+            "name": "WebServer",
+            "request": "launch",
+            "mainClass": "src.WebServer",
+            "projectName": "javaProjects_a422883c"
+        },
+        {
+            "type": "java",
             "name": "MNIST_CSV_Loader",
             "request": "launch",
             "mainClass": "src.neural_network.MNIST_CSV_Loader",

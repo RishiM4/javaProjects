@@ -3,10 +3,10 @@ package src.chessV2;
 import java.util.*;
 
 public class MiniMax {
-    private final BitBoard board;
+    private final Board board;
     private final int maxDepth;
 
-    public MiniMax(BitBoard b, int depth) {
+    public MiniMax(Board b, int depth) {
         this.board = b;
         this.maxDepth = depth;
     }
@@ -67,8 +67,8 @@ public class MiniMax {
 
         
         long time = System.currentTimeMillis();
-        BitBoard board = new BitBoard();
-        board.loadFromArray(start, BitBoard.WHITE);
+        Board board = new Board();
+        board.loadFromArray(start, Board.WHITE);
         MiniMax engine = new MiniMax(board, 5);
 
         int[] res = engine.findBestMove();
@@ -80,7 +80,7 @@ public class MiniMax {
         } else {
             System.out.println("Best score: " + bestScore);
         }
-        System.out.println("Best move: " + BitBoard.moveToString(bestMove));
+        System.out.println("Best move: " + Board.moveToString(bestMove));
         System.err.println("TIME:" + (System.currentTimeMillis()-time));
     }
 }
